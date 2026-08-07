@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mobile Data Sync Portal - cAm LOGISTICS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary": "#5d5f5f",
+                        "background": "#f8f9ff",
+                        "primary-fixed": "#ffdbcc",
+                        "on-surface-variant": "#5a4136",
+                        "tertiary-fixed": "#dae2fd",
+                        "primary-fixed-dim": "#ffb693",
+                        "surface": "#f8f9ff",
+                        "secondary-fixed-dim": "#c6c6c7",
+                        "on-secondary-fixed": "#1a1c1c",
+                        "on-primary-container": "#572000",
+                        "inverse-surface": "#213145",
+                        "outline": "#8e7164",
+                        "surface-variant": "#d3e4fe",
+                        "surface-dim": "#cbdbf5",
+                        "primary-container": "#ff6b00",
+                        "inverse-primary": "#ffb693",
+                        "secondary-fixed": "#e2e2e2",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-primary-fixed": "#351000",
+                        "tertiary-container": "#9198b1",
+                        "surface-container": "#e5eeff",
+                        "surface-container-high": "#dce9ff",
+                        "outline-variant": "#e2bfb0",
+                        "on-secondary-container": "#616363",
+                        "on-tertiary-container": "#293045",
+                        "on-primary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "primary": "#a04100",
+                        "tertiary-fixed-dim": "#bec6e0",
+                        "on-surface": "#0b1c30",
+                        "on-error-container": "#93000a",
+                        "on-background": "#0b1c30",
+                        "surface-container-low": "#eff4ff",
+                        "on-tertiary-fixed-variant": "#3f465c",
+                        "surface-bright": "#f8f9ff",
+                        "on-secondary-fixed-variant": "#454747",
+                        "tertiary": "#565e74",
+                        "secondary-container": "#dfe0e0",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "inverse-on-surface": "#eaf1ff",
+                        "on-tertiary-fixed": "#131b2e",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed-variant": "#7a3000",
+                        "surface-tint": "#a04100"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "margin-desktop": "32px",
+                        "gutter": "16px",
+                        "base": "4px",
+                        "md": "16px",
+                        "margin-mobile": "16px",
+                        "xs": "4px",
+                        "lg": "24px",
+                        "xl": "32px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "label-md": ["JetBrains Mono"],
+                        "headline-sm": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["JetBrains Mono"]
+                    },
+                    "fontSize": {
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "label-md": ["13px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .animate-pulse-slow {
+            animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col md:flex-row">
+<!-- Top App Bar (Mobile Only) -->
+<header class="md:hidden flex justify-between items-center w-full px-margin-mobile h-16 bg-surface dark:bg-surface-dim text-primary dark:text-primary-fixed-dim border-b border-outline-variant dark:border-outline z-50 sticky top-0">
+<div class="flex items-center gap-3">
+<button class="material-symbols-outlined text-headline-sm p-2 hover:bg-surface-container rounded-full transition-colors duration-200">menu</button>
+<div class="flex items-center gap-2">
+<img alt="cAm LOGISTICS Logo" class="h-8" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAjyXLbzB1uJB6NyIVRJy14ZDnpYn0SCZSCT1Nfy1etHHeJsQcu6il0GQAxcfsxjFT_IY05XP0IDTykJK1tGWvLZywbz81ho87hPsuThDgeTeJYD0uzocWt5RWnt3HNqARKDucJSOcSMpQGokVlJQyxaSO1SyEd0Lh8At8-FNDkGioQDxe6MX3YwVe82LMzIHRJ_UecYNaSwQmy3IctgvNG89EEfOf1YXt1F7s-VsY2qR7v25DUGwEXWe_y1OuFcFx4TuM"/>
+<span class="text-headline-sm font-headline-sm font-bold tracking-tight">cAm LOGISTICS</span>
+</div>
+</div>
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-label-md">
+            OP
+        </div>
+</header>
+<!-- Side Navigation (Desktop Only) -->
+<nav class="hidden md:flex fixed inset-y-0 left-0 z-[60] flex-col p-4 bg-surface-container-low dark:bg-surface-container-highest shadow-xl w-64 h-full border-r border-outline-variant/30">
+<div class="flex items-center gap-3 mb-8 px-4">
+<img alt="cAm LOGISTICS Logo" class="h-10" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD9GmD6lr3ahKez7KM2yo0Up0q3luneBtmQaicVXuRY4cNuYjGzy9kiIpLORwOVsai1COzZCDgxdI0BaNX0XQ0lvNL-aWhs358oRUtrHEiduNzm5Feu4qar7jkPrjTqXCa_cqvwahWF3YdDqsN_Yr5robHwAiq4fsRp50APzitDr_onJkpHiwtV5aWBJli12ySYcF4IQBPwW9N8IcV9VAKlHa8Ztt7nMeOI9jwlKEyFk1AxFrv8LxCGQL6GVvydxM5o6eM"/>
+</div>
+<div class="flex flex-col gap-1 flex-grow">
+<a class="flex items-center gap-3 px-4 py-3 rounded-r-full text-on-surface-variant hover:bg-surface-container-high transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-r-full text-on-surface-variant hover:bg-surface-container-high transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined">local_shipping</span>
+<span class="font-label-md">Shipments</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-r-full bg-primary-container text-on-primary-container font-bold shadow-sm transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined">sync</span>
+<span class="font-label-md">Sync</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-r-full text-on-surface-variant hover:bg-surface-container-high transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined">assessment</span>
+<span class="font-label-md">Reports</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-r-full text-on-surface-variant hover:bg-surface-container-high transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-md">Users</span>
+</a>
+</div>
+<div class="mt-auto border-t border-outline-variant/30 pt-4 px-4 flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-label-md">
+                OP
+            </div>
+<div>
+<p class="font-label-md text-on-surface">Operations Manager</p>
+<p class="font-body-sm text-secondary">cAm Logistics HQ</p>
+</div>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-grow md:ml-64 p-margin-mobile md:p-margin-desktop bg-background pb-24 md:pb-margin-desktop">
+<header class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+<div>
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-background">Data Synchronization</h1>
+<p class="font-body-md text-secondary mt-1">Manage and monitor live data streams across all platforms.</p>
+</div>
+<button class="bg-primary hover:bg-primary/90 text-on-primary px-6 py-2 rounded-lg font-label-md flex items-center gap-2 shadow-sm transition-colors w-full sm:w-auto justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">sync</span>
+                Manual Sync
+            </button>
+</header>
+<!-- Status Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter mb-8">
+<!-- ERP Status -->
+<div class="bg-surface border border-outline-variant rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-surface-container-high rounded-lg text-primary">
+<span class="material-symbols-outlined">database</span>
+</div>
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#e6f4ea] text-[#137333] font-label-sm border border-[#ceead6]">
+<span class="w-1.5 h-1.5 rounded-full bg-[#1e8e3e] animate-pulse-slow"></span>
+                        ONLINE
+                    </span>
+</div>
+<h3 class="font-headline-sm text-on-surface mb-1">ERP System</h3>
+<p class="font-body-sm text-secondary mb-4">Core inventory and routing data.</p>
+<div class="flex justify-between text-body-sm border-t border-outline-variant/50 pt-3">
+<span class="text-secondary">Last Sync</span>
+<span class="font-label-md text-on-surface">Just now</span>
+</div>
+</div>
+<!-- Telematics Status -->
+<div class="bg-surface border border-outline-variant rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-surface-container-high rounded-lg text-primary">
+<span class="material-symbols-outlined">satellite_alt</span>
+</div>
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#e6f4ea] text-[#137333] font-label-sm border border-[#ceead6]">
+<span class="w-1.5 h-1.5 rounded-full bg-[#1e8e3e] animate-pulse-slow"></span>
+                        ONLINE
+                    </span>
+</div>
+<h3 class="font-headline-sm text-on-surface mb-1">Telematics API</h3>
+<p class="font-body-sm text-secondary mb-4">Live fleet GPS and diagnostics.</p>
+<div class="flex justify-between text-body-sm border-t border-outline-variant/50 pt-3">
+<span class="text-secondary">Last Sync</span>
+<span class="font-label-md text-on-surface">2 min ago</span>
+</div>
+</div>
+<!-- Weather Status -->
+<div class="bg-surface border border-outline-variant rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-surface-container-high rounded-lg text-primary">
+<span class="material-symbols-outlined">partly_cloudy_day</span>
+</div>
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#fef7e0] text-[#b06000] font-label-sm border border-[#fadd9e]">
+<span class="w-1.5 h-1.5 rounded-full bg-[#f29900]"></span>
+                        DELAYED
+                    </span>
+</div>
+<h3 class="font-headline-sm text-on-surface mb-1">Weather Service</h3>
+<p class="font-body-sm text-secondary mb-4">Regional route impact forecasts.</p>
+<div class="flex justify-between text-body-sm border-t border-outline-variant/50 pt-3">
+<span class="text-secondary">Last Sync</span>
+<span class="font-label-md text-on-surface">15 min ago</span>
+</div>
+</div>
+</div>
+<!-- Sync History Table -->
+<div class="bg-surface border border-outline-variant rounded-xl overflow-hidden shadow-sm">
+<div class="px-6 py-4 border-b border-outline-variant bg-surface-container-lowest">
+<h2 class="font-headline-sm text-on-surface">Recent Sync Jobs</h2>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low text-secondary font-label-md border-b border-outline-variant">
+<th class="px-6 py-3 font-medium">Job ID</th>
+<th class="px-6 py-3 font-medium">Service</th>
+<th class="px-6 py-3 font-medium">Timestamp</th>
+<th class="px-6 py-3 font-medium">Records</th>
+<th class="px-6 py-3 font-medium">Status</th>
+</tr>
+</thead>
+<tbody class="font-body-sm text-on-surface divide-y divide-outline-variant/50">
+<tr class="hover:bg-surface-container-lowest transition-colors group">
+<td class="px-6 py-4 font-label-md text-primary group-hover:text-primary-container">#SYNC-8924</td>
+<td class="px-6 py-4">ERP System</td>
+<td class="px-6 py-4 text-secondary">Today, 14:32:01</td>
+<td class="px-6 py-4 font-label-md">1,245</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-[#e6f4ea] text-[#137333]">SUCCESS</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors group">
+<td class="px-6 py-4 font-label-md text-primary group-hover:text-primary-container">#SYNC-8923</td>
+<td class="px-6 py-4">Telematics API</td>
+<td class="px-6 py-4 text-secondary">Today, 14:30:15</td>
+<td class="px-6 py-4 font-label-md">342</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-[#e6f4ea] text-[#137333]">SUCCESS</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors group">
+<td class="px-6 py-4 font-label-md text-primary group-hover:text-primary-container">#SYNC-8922</td>
+<td class="px-6 py-4">Weather Service</td>
+<td class="px-6 py-4 text-secondary">Today, 14:15:00</td>
+<td class="px-6 py-4 font-label-md">--</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-[#fce8e6] text-[#c5221f]">FAILED</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors group">
+<td class="px-6 py-4 font-label-md text-primary group-hover:text-primary-container">#SYNC-8921</td>
+<td class="px-6 py-4">ERP System</td>
+<td class="px-6 py-4 text-secondary">Today, 13:32:05</td>
+<td class="px-6 py-4 font-label-md">1,180</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-[#e6f4ea] text-[#137333]">SUCCESS</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="px-6 py-3 border-t border-outline-variant bg-surface-container-lowest flex justify-end">
+<button class="text-primary font-label-md text-sm hover:underline flex items-center gap-1">
+                    View All Logs
+                    <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 py-3 bg-surface dark:bg-surface-dim border-t border-outline-variant dark:border-outline shadow-lg rounded-t-xl">
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-primary-fixed scale-95 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-label-sm font-label-sm mt-1">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-primary-fixed scale-95 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined">local_shipping</span>
+<span class="text-label-sm font-label-sm mt-1">Shipments</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-on-primary-fixed-variant text-on-primary-container dark:text-primary-fixed rounded-full px-4 py-1 scale-95 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">sync</span>
+<span class="text-label-sm font-label-sm mt-1">Sync</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-primary-fixed scale-95 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined">assessment</span>
+<span class="text-label-sm font-label-sm mt-1">Reports</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-primary-fixed scale-95 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="text-label-sm font-label-sm mt-1">Users</span>
+</a>
+</nav>
+</body></html>

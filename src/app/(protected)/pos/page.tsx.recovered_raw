@@ -1,0 +1,808 @@
+Created At: 2026-08-05T08:07:39Z
+Completed At: 2026-08-05T08:07:39Z
+File Path: `file:///c:/Users/IT%20CAM/Documents/pos_cam/src/app/%28protected%29/pos/page.tsx`
+Total Lines: 966
+Total Bytes: 43688
+Showing lines 1 to 800
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+1: "use client";
+2: 
+3: import { useState, useEffect } from "react";
+4: import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+5: import { Button } from "@/components/ui/button";
+6: import { Input } from "@/components/ui/input";
+7: import { Label } from "@/components/ui/label";
+8: import { Badge } from "@/components/ui/badge";
+9: import { Textarea } from "@/components/ui/textarea";
+10: import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+11: import { 
+12:   MapPin, 
+13:   Truck, 
+14:   CheckCircle2, 
+15:   Plus, 
+16:   PackageCheck, 
+17:   PackageOpen, 
+18:   FileCheck, 
+19:   AlertTriangle, 
+20:   Settings2,
+21:   Trash2,
+22:   Search
+23: } from "lucide-react";
+24: import { createClient } from "@/utils/supabase/client";
+25: 
+26: const STT_STATUS = [
+27:   { name: "Di Lokasi Muat", icon: MapPin },
+28:   { name: "Selesai Muat", icon: PackageCheck },
+29:   { name: "Di Perjalanan", icon: Truck },
+30:   { name: "Bongkar", icon: PackageOpen },
+31:   { name: "Selesai Bongkar", icon: CheckCircle2 },
+32:   { name: "Dokumen Kembali", icon: FileCheck },
+33:   { name: "Bermasalah", icon: AlertTriangle },
+34:   { name: "Custom", icon: Settings2 }
+35: ];
+36: 
+37: const CABANG_OPTIONS = [
+38:   "CAM SUB", "CAM SMG", "CAM BKS", "SPP SUB", "SPP SMG", "SPP BKS", "TETRA"
+39: ];
+40: 
+41: const VENDOR_PRICE_OPTIONS = [
+42:   "Harga Standar", "Harga Mahal", "Harga Mahal Momen", "Memakai Unit CAM"
+43: ];
+44: 
+45: export default function PosPage() {
+46:   const supabase = createClient();
+47:   const [data, setData] = useState<any[]>([]);
+48:   const [searchTerm, setSearchTerm] = useState("");
+49:   const [isEditing, setIsEditing] = useState(false);
+50:   const [editingId, setEditingId] = useState<string | null>(null);
+51:   
+52:   // -- Card 1: Informasi Utama --
+53:   const [tglMasuk, setTglMasuk] = useState(() => new Date().toISOString().split('T')[0]);
+54:   const [newStt, setNewStt] = useState("");
+55:   const [selectedCustomer, setSelectedCustomer] = useState(""); // Dropsown Statis
+56:   const [namaCustomerTeks, setNamaCustomerTeks] = useState(""); // Input Manual
+57:   const [selectedService, setSelectedService] = useState("FTL");
+58:   const [targetSla, setTargetSla] = useState("1");
+59:   
+60:   // -- Card 2: Detail Alamat & Kontak --
+61:   const [alamatMuat, setAlamatMuat] = useState("");
+62:   const [recipientName, setRecipientName] = useState("");
+63:   const [recipientPhone, setRecipientPhone] = useState("");
+64:   const [alamatTujuan, setAlamatTujuan] = useState("");
+65: 
+66:   // -- Card 3: Informasi Kargo --
+67:   const [beratKg, setBeratKg] = useState("");
+68:   const [volume, setVolume] = useState("");
+69:   const [qtyKoli, setQtyKoli] = useState("");
+70: 
+71:   // -- Card 4: Informasi Armada & Vendor --
+72:   const [newNopol, setNewNopol] = useState("");
+73:   const [driverName, setDriverName] = useState("");
+74:   const [driverPhone, setDriverPhone] = useState("");
+75:   const [jenisUnit, setJenisUnit] = useState("");
+76:   const [vendorPrice, setVendorPrice] = useState("");
+77:   const [monitoringPj, setMonitoringPj] = useState("");
+78: 
+79:   // -- Card 5: Penyelesaian & Biaya --
+80:   const [tkbm, setTkbm] = useState("");
+81:   const [omset, setOmset] = useState("");
+82:   const [tglDiterima, setTglDiterima] = useState("");
+83:   const [keteranganCustom, setKeteranganCustom] = useState("");
+84: 
+85:   // -- Card 6: Indikator KPI & Evaluasi --
+86:   const [rateSla, setRateSla] = useState("");
+87:   const [rateKomplain, setRateKomplain] = useState("");
+88:   const [rateKud, setRateKud] = useState("");
+89:   const [kecepatanDoc, setKecepatanDoc] = useState("");
+90:   const [hargaVendor, setHargaVendor] = useState("");
+91: 
+92:   // Tracker State
+93:   const [selectedStatus, setSelectedStatus] = useState("Di Lokasi Muat");
+94:   const [customStatusText, setCustomStatusText] = useState("");
+95: 
+96:   const [isLoading, setIsLoading] = useState(false);
+97: 
+98:   const isFTL = selectedService === "FTL";
+99: 
+100:   useEffect(() => {
+101:     fetchShipments();
+102:   }, []);
+103: 
+104:   const fetchShipments = async (term = searchTerm) => {
+105:     try {
+106:       let query = supabase.from("shipments").select(`
+107:         *,
+108:         master_vehicles ( nopol )
+109:       `);
+110: 
+111:       if (!term || term.trim() === "") {
+112:         const today = new Date();
+113:         today.setHours(0, 0, 0, 0);
+114:         const startOfToday = today.toISOString(); 
+115: 
+116:         query = query
+117:           .gte('tgl_masuk', startOfToday)
+118:           .order('created_at', { ascending: false })
+119:           .limit(15);
+120:       } else {
+121:         query = query
+122:           .or(`no_stt.ilike.%${term}%,cabang_customer.ilike.%${term}%,nama_customer_teks.ilike.%${term}%`)
+123:           .order('created_at', { ascending: false })
+124:           .limit(50);
+125:       }
+126: 
+127:       const { data: shipData, error } = await query;
+128:       if (error) throw error;
+129:       setData(shipData || []);
+130:     } catch (error: any) {
+131:       console.error("Gagal mengambil log eksekusi:", error.message);
+132:     }
+133:   };
+134: 
+135:   const resetForm = () => {
+136:     setTglMasuk(new Date().toISOString().split('T')[0]);
+137:     setNewStt("");
+138:     setSelectedCustomer("");
+139:     setNamaCustomerTeks("");
+140:     setSelectedService("FTL");
+141:     setTargetSla("1");
+142:     setAlamatMuat("");
+143:     setRecipientName("");
+144:     setRecipientPhone("");
+145:     setAlamatTujuan("");
+146:     setBeratKg("");
+147:     setVolume("");
+148:     setQtyKoli("");
+149:     setNewNopol("");
+150:     setDriverName("");
+151:     setDriverPhone("");
+152:     setJenisUnit("");
+153:     setVendorPrice("");
+154:     setMonitoringPj("");
+155:     setTkbm("");
+156:     setOmset("");
+157:     setTglDiterima("");
+158:     setKeteranganCustom("");
+159:     setRateSla("");
+160:     setRateKomplain("");
+161:     setRateKud("");
+162:     setKecepatanDoc("");
+163:     setHargaVendor("");
+164:     setSelectedStatus("Di Lokasi Muat");
+165:     setCustomStatusText("");
+166:     setIsEditing(false);
+167:     setEditingId(null);
+168:   };
+169: 
+170:   const handleEdit = (item: any) => {
+171:     setIsEditing(true);
+172:     setEditingId(item.id);
+173:     
+174:     setTglMasuk(item.tgl_masuk || new Date().toISOString().split('T')[0]);
+175:     setNewStt(item.no_stt || "");
+176:     setSelectedCustomer(item.cabang_customer || "");
+177:     setNamaCustomerTeks(item.nama_customer_teks || "");
+178:     setSelectedService(item.jenis_layanan || "FTL");
+179:     setTargetSla(item.rule_sla_hari?.toString() || "1");
+180:     
+181:     setAlamatMuat(item.alamat_muat || "");
+182:     setRecipientName(item.recipient_name || "");
+183:     setRecipientPhone(item.recipient_phone || "");
+184:     setAlamatTujuan(item.alamat_tujuan || "");
+185:     
+186:     setBeratKg(item.berat_kg?.toString() || "");
+187:     setVolume(item.volume_m3?.toString() || "");
+188:     setQtyKoli(item.qty_koli?.toString() || "");
+189:     
+190:     setNewNopol(item.master_vehicles?.nopol || "");
+191:     setDriverName(item.driver_name || "");
+192:     setDriverPhone(item.driver_phone || "");
+193:     setJenisUnit(item.jenis_unit || "");
+194:     setVendorPrice(item.vendor_price || "");
+195:     setMonitoringPj(item.monitoring_pj || "");
+196:     
+197:     setTkbm(item.tkbm || "");
+198:     setOmset(item.omset?.toString() || "");
+199:     setTglDiterima(item.tgl_diterima || "");
+200:     setKeteranganCustom(item.keterangan_custom || "");
+201:     setRateSla(item.rate_sla || "");
+202:     setRateKomplain(item.rate_komplain || "");
+203:     setRateKud(item.rate_kud || "");
+204:     setKecepatanDoc(item.kecepatan_doc || "");
+205:     setHargaVendor(item.harga_vendor || "");
+206:     
+207:     const isStandardStatus = STT_STATUS.some(s => s.name === item.status_pengiriman);
+208:     if (isStandardStatus) {
+209:       setSelectedStatus(item.status_pengiriman);
+210:       setCustomStatusText("");
+211:     } else {
+212:       setSelectedStatus("Custom");
+213:       setCustomStatusText(item.status_pengiriman || "");
+214:     }
+215:     
+216:     window.scrollTo({ top: 0, behavior: "smooth" });
+217:   };
+218: 
+219:   const handleDelete = async (id: string, stt: string) => {
+220:     if (window.confirm(`Apakah Anda yakin ingin menghapus STT ${stt || 'Tanpa Nomor'} secara permanen?`)) {
+221:       setIsLoading(true);
+222:       try {
+223:         const { error } = await supabase.from('shipments').delete().eq('id', id);
+224:         if (error) throw error;
+225:         await fetchShipments(searchTerm);
+226:       } catch (err: any) {
+227:         alert("Gagal menghapus data: " + err.message);
+228:       } finally {
+229:         setIsLoading(false);
+230:       }
+231:     }
+232:   };
+233: 
+234:   const handleSubmitStt = async (e: React.FormEvent) => {
+235:     e.preventDefault();
+236:     if (!selectedCustomer) {
+237:         alert("Mohon isi Customer");
+238:         return;
+239:     }
+240:     
+241:     setIsLoading(true);
+242: 
+243:     const finalStatus = selectedStatus === "Custom" && customStatusText ? customStatusText : selectedStatus;
+244: 
+245:     try {
+246:       // 1. Resolve or Insert Vehicle
+247:       let vehicleId = null;
+248:       if (newNopol) {
+249:         const { data: vData } = await supabase
+250:           .from("master_vehicles")
+251:           .select("id")
+252:           .eq("nopol", newNopol)
+253:           .single();
+254:           
+255:         if (vData) {
+256:           vehicleId = vData.id;
+257:         } else {
+258:           const { data: newV } = await supabase
+259:             .from("master_vehicles")
+260:             .insert({ nopol: newNopol, jenis_unit: jenisUnit || null })
+261:             .select("id")
+262:             .single();
+263:           if (newV) vehicleId = newV.id;
+264:         }
+265:       }
+266: 
+267:       // 2. Insert or Update Shipment
+268:       const payload: any = {
+269:         tgl_masuk: tglMasuk,
+270:         no_stt: newStt.trim() === "" ? null : newStt,
+271:         cabang_customer: selectedCustomer,
+272:         nama_customer_teks: namaCustomerTeks,
+273:         jenis_layanan: selectedService,
+274:         status_pengiriman: finalStatus,
+275:         rule_sla_hari: parseInt(targetSla) || 1,
+276:         
+277:         // Alamat & Kontak
+278:         alamat_muat: alamatMuat,
+279:         alamat_tujuan: alamatTujuan,
+280:         recipient_name: recipientName,
+281:         recipient_phone: recipientPhone,
+282:         
+283:         // Kargo
+284:         berat_kg: parseFloat(beratKg) || 0,
+285:         volume_m3: parseFloat(volume) || 0,
+286:         qty_koli: parseInt(qtyKoli) || 0,
+287:         
+288:         // Armada & Vendor
+289:         vehicle_id: vehicleId,
+290:         driver_name: driverName,
+291:         driver_phone: driverPhone,
+292:         jenis_unit: isFTL ? jenisUnit : null,
+293:         vendor_price: isFTL ? vendorPrice : null,
+294:         monitoring_pj: isFTL ? monitoringPj : null,
+295:         
+296:         // Biaya & Penyelesaian
+297:         tkbm: tkbm,
+298:         omset: parseFloat(omset) || 0,
+299:         keterangan_custom: keteranganCustom,
+300:         
+301:         // KPI & Evaluasi
+302:         rate_sla: rateSla || null,
+303:         rate_komplain: rateKomplain || null,
+304:         rate_kud: rateKud || null,
+305:         kecepatan_doc: kecepatanDoc || null,
+306:         harga_vendor: hargaVendor || null
+307:       };
+308: 
+309:       if (tglDiterima) {
+310:           payload.tgl_diterima = tglDiterima;
+311:       }
+312: 
+313:       if (isEditing && editingId) {
+314:         const { error } = await supabase
+315:           .from("shipments")
+316:           .update(payload)
+317:           .eq("id", editingId);
+318:         if (error) throw error;
+319:         alert("Data berhasil diupdate!");
+320:       } else {
+321:         const { error } = await supabase
+322:           .from("shipments")
+323:           .insert(payload);
+324:         if (error) throw error;
+325:       }
+326:       
+327:       resetForm();
+328:       await fetchShipments(searchTerm);
+329: 
+330:     } catch (err: any) {
+331:       console.error("Failed to save shipment:", err, JSON.stringify(err));
+332:       const errorMsg = err?.message || err?.details || JSON.stringify(err) || String(err);
+333:       alert(`Gagal menyimpan STT: ${errorMsg}`);
+334:     } finally {
+335:       setIsLoading(false);
+336:     }
+337:   };
+338: 
+339:   const getStatusIndex = (status: string) => {
+340:       const idx = STT_STATUS.findIndex(s => s.name === status);
+341:       return idx >= 0 ? idx : STT_STATUS.length - 1; // if not found, it's custom
+342:   };
+343: 
+344:   return (
+345:     <div className="flex-1 space-y-6 p-8 pt-6 overflow-y-auto bg-slate-50">
+346:       <div className="flex items-center justify-between space-y-2">
+347:         <h2 className="text-3xl font-bold tracking-tight font-sans text-slate-800">
+348:           Delivery Management (POS)
+349:         </h2>
+350:       </div>
+351:       
+352:       {/* Top Section: Interactive Stepper Tracker */}
+353:       <Card className="border-orange-100 shadow-sm bg-white">
+354:         <CardHeader className="pb-4">
+355:           <CardTitle className="font-sans text-lg">Update Tracker Resi</CardTitle>
+356:           <CardDescription>
+357:             Pilih status saat ini untuk STT baru. Klik ikon untuk mengubah status.
+358:           </CardDescription>
+359:         </CardHeader>
+360:         <CardContent>
+361:           <div className="relative">
+362:             <div className="flex justify-between items-start px-2 py-4 overflow-x-auto min-w-full pb-6 scrollbar-hide">
+363:               {STT_STATUS.map((status, index) => {
+364:                 const currentIdx = getStatusIndex(selectedStatus);
+365:                 const isActive = index <= currentIdx; 
+366:                 const isSelected = index === currentIdx;
+367:                 const isIssue = status.name === "Bermasalah";
+368:                 
+369:                 const Icon = status.icon;
+370:                 
+371:                 return (
+372:                   <div 
+373:                     key={status.name} 
+374:                     onClick={() => {
+375:                         setSelectedStatus(status.name);
+376:                         if(status.name !== "Custom") setCustomStatusText("");
+377:                     }}
+378:                     className="flex flex-col items-center relative z-10 min-w-[120px] px-2 shrink-0 cursor-pointer group"
+379:                   >
+380:                     <div className={`w-12 h-12 rounded-full flex items-center justify-center border-2 mb-3 transition-all duration-300 bg-white
+381:                       ${isSelected ? "border-orange-600 text-orange-600 ring-4 ring-orange-100 shadow-lg scale-110" 
+382:                       : isActive ? "border-orange-600 bg-orange-600 text-white" 
+383:                       : isIssue ? "border-slate-200 text-red-300 group-hover:border-red-300"
+384:                       : "border-slate-200 text-slate-300 group-hover:border-orange-300 group-hover:text-orange-400"}`}>
+385:                       <Icon className="w-5 h-5" />
+386:                     </div>
+387:                     <span className={`text-xs font-semibold text-center leading-tight transition-colors
+388:                       ${isSelected ? 'text-orange-700' : isActive ? 'text-slate-800' : isIssue ? 'text-red-400/70' : 'text-slate-400 group-hover:text-orange-500'}`}>
+389:                       {status.name}
+390:                     </span>
+391:                   </div>
+392:                 );
+393:               })}
+394:               
+395:               {/* Background Line */}
+396:               <div className="absolute top-[2rem] left-14 right-14 h-[2px] bg-slate-100 -z-0">
+397:                 <div 
+398:                 className="h-full bg-orange-500 transition-all duration-500 ease-in-out" 
+399:                 style={{ width: `${(getStatusIndex(selectedStatus) / (STT_STATUS.length - 1)) * 100}%` }}
+400:               ></div>
+401:               </div>
+402:             </div>
+403: 
+404:             {selectedStatus === "Custom" && (
+405:                 <div className="mt-4 p-4 bg-orange-50 rounded-lg border border-orange-100 animate-in slide-in-from-top-2">
+406:                     <Label htmlFor="customStatus" className="text-orange-800 font-semibold mb-2 block">Nama Status Kustom</Label>
+407:                     <Input 
+408:                         id="customStatus"
+409:                         value={customStatusText}
+410:                         onChange={(e) => setCustomStatusText(e.target.value)}
+411:                         placeholder="Misal: Tertahan di Pelabuhan"
+412:                         className="bg-white border-orange-200 focus-visible:ring-orange-500"
+413:                     />
+414:                 </div>
+415:             )}
+416:           </div>
+417:         </CardContent>
+418:       </Card>
+419: 
+420:       {/* Main Grid: Form Generation */}
+421:       <form onSubmit={handleSubmitStt} className="space-y-6">
+422:         <div className="grid gap-6 md:grid-cols-2 items-start">
+423:           
+424:           {/* Left Column */}
+425:           <div className="space-y-6">
+426:             
+427:             {/* Card 1: Informasi Utama */}
+428:             <Card className="shadow-sm">
+429:               <CardHeader className="pb-4 border-b border-slate-50 mb-4 bg-slate-50/50">
+430:                 <CardTitle className="font-sans text-lg text-slate-800">1. Informasi Utama</CardTitle>
+431:               </CardHeader>
+432:               <CardContent className="space-y-4">
+433:                 <div className="grid grid-cols-2 gap-4">
+434:                   <div className="space-y-2">
+435:                     <Label htmlFor="tglMasuk" className="font-sans font-medium">Tgl Masuk</Label>
+436:                     <Input 
+437:                       id="tglMasuk" 
+438:                       type="date"
+439:                       value={tglMasuk}
+440:                       onChange={(e) => setTglMasuk(e.target.value)}
+441:                       className="font-sans"
+442:                       disabled={isLoading}
+443:                       required
+444:                     />
+445:                   </div>
+446:                   <div className="space-y-2">
+447:                     <Label htmlFor="stt" className="font-sans font-medium">No. STT</Label>
+448:                     <Input 
+449:                       id="stt" 
+450:                       placeholder="STT-10027" 
+451:                       value={newStt}
+452:                       onChange={(e) => setNewStt(e.target.value.toUpperCase())}
+453:                       className="font-mono uppercase font-semibold text-orange-700 bg-orange-50/30"
+454:                       disabled={isLoading}
+455:                     />
+456:                   </div>
+457:                 </div>
+458:                 
+459:                 <div className="grid grid-cols-2 gap-4">
+460:                     <div className="space-y-2">
+461:                     <Label htmlFor="customer" className="font-sans font-medium">Customer (Downdrip)</Label>
+462:                     <select 
+463:                         id="customer" 
+464:                         value={selectedCustomer}
+465:                         onChange={(e) => setSelectedCustomer(e.target.value)}
+466:                         className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring font-sans"
+467:                         disabled={isLoading}
+468:                         required
+469:                     >
+470:                         <option value="">Pilih Cabang...</option>
+471:                         {CABANG_OPTIONS.map((c) => (
+472:                         <option key={c} value={c}>{c}</option>
+473:                         ))}
+474:                     </select>
+475:                     </div>
+476:                     <div className="space-y-2">
+477:                     <Label htmlFor="namaCustomerTeks" className="font-sans font-medium">Nama Klien (Riil)</Label>
+478:                     <Input 
+479:                         id="namaCustomerTeks" 
+480:                         placeholder="Misal: Radiant" 
+481:                         value={namaCustomerTeks}
+482:                         onChange={(e) => setNamaCustomerTeks(e.target.value)}
+483:                         className="font-sans"
+484:                         disabled={isLoading}
+485:                     />
+486:                     </div>
+487:                 </div>
+488:                 
+489:                 <div className="grid grid-cols-2 gap-4">
+490:                     <div className="space-y-2">
+491:                     <Label htmlFor="service" className="font-sans font-medium">Layanan</Label>
+492:                     <select 
+493:                         id="service" 
+494:                         value={selectedService}
+495:                         onChange={(e) => setSelectedService(e.target.value)}
+496:                         className="flex h-10 w-full rounded-md border border-input bg-slate-50 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring font-sans font-semibold text-slate-700"
+497:                         disabled={isLoading}
+498:                     >
+499:                         <option value="FTL">FTL - Full Truck Load</option>
+500:                         <option value="LTL">LTL - Less Than Truckload</option>
+501:                         <option value="LCL">LCL - Less Container Load</option>
+502:                     </select>
+503:                     </div>
+504:                     <div className="space-y-2">
+505:                     <Label htmlFor="targetSla" className="font-sans font-medium">Target SLA (Hari)</Label>
+506:                     <Input 
+507:                         id="targetSla"
+508:                         type="number" 
+509:                         placeholder="1" 
+510:                         value={targetSla}
+511:                         onChange={(e) => setTargetSla(e.target.value)}
+512:                         className="font-mono"
+513:                         disabled={isLoading}
+514:                         required
+515:                     />
+516:                     </div>
+517:                 </div>
+518:               </CardContent>
+519:             </Card>
+520: 
+521:             {/* Card 2: Detail Alamat & Kontak */}
+522:             <Card className="shadow-sm">
+523:               <CardHeader className="pb-4 border-b border-slate-50 mb-4 bg-slate-50/50">
+524:                 <CardTitle className="font-sans text-lg text-slate-800">2. Detail Alamat & Kontak</CardTitle>
+525:               </CardHeader>
+526:               <CardContent className="space-y-4">
+527:                 <div className="space-y-2">
+528:                   <Label htmlFor="alamatMuat" className="font-sans font-medium">Pengirim: Alamat Muat</Label>
+529:                   <Textarea 
+530:                     id="alamatMuat" 
+531:                     placeholder="Alamat lengkap pengambilan barang..." 
+532:                     value={alamatMuat}
+533:                     onChange={(e) => setAlamatMuat(e.target.value)}
+534:                     className="resize-none font-sans text-sm"
+535:                     rows={2}
+536:                     disabled={isLoading}
+537:                   />
+538:                 </div>
+539:                 
+540:                 <div className="grid grid-cols-2 gap-4 pt-2 border-t border-slate-100">
+541:                     <div className="space-y-2">
+542:                         <Label htmlFor="recipientName" className="font-sans font-medium">Nama Penerima</Label>
+543:                         <Input 
+544:                             id="recipientName" 
+545:                             placeholder="Nama penerima..." 
+546:                             value={recipientName}
+547:                             onChange={(e) => setRecipientName(e.target.value)}
+548:                             className="font-sans"
+549:                             disabled={isLoading}
+550:                         />
+551:                     </div>
+552:                     <div className="space-y-2">
+553:                         <Label htmlFor="recipientPhone" className="font-sans font-medium">No. Penerima</Label>
+554:                         <Input 
+555:                             id="recipientPhone" 
+556:                             placeholder="0812..." 
+557:                             value={recipientPhone}
+558:                             onChange={(e) => setRecipientPhone(e.target.value)}
+559:                             className="font-mono"
+560:                             disabled={isLoading}
+561:                         />
+562:                     </div>
+563:                 </div>
+564:                 
+565:                 <div className="space-y-2">
+566:                   <Label htmlFor="alamatTujuan" className="font-sans font-medium">Penerima: Alamat Tujuan</Label>
+567:                   <Textarea 
+568:                     id="alamatTujuan" 
+569:                     placeholder="Alamat lengkap tujuan pengiriman..." 
+570:                     value={alamatTujuan}
+571:                     onChange={(e) => setAlamatTujuan(e.target.value)}
+572:                     className="resize-none font-sans text-sm"
+573:                     rows={2}
+574:                     disabled={isLoading}
+575:                   />
+576:                 </div>
+577:               </CardContent>
+578:             </Card>
+579: 
+580:             {/* Card 3: Informasi Kargo */}
+581:             <Card className="shadow-sm">
+582:               <CardHeader className="pb-4 border-b border-slate-50 mb-4 bg-slate-50/50">
+583:                 <CardTitle className="font-sans text-lg text-slate-800">3. Informasi Kargo</CardTitle>
+584:               </CardHeader>
+585:               <CardContent>
+586:                 <div className="grid grid-cols-3 gap-4">
+587:                     <div className="space-y-2">
+588:                       <Label htmlFor="beratKg" className="font-sans font-medium text-xs text-slate-500 uppercase tracking-wider">Berat (Kg)</Label>
+589:                       <Input 
+590:                         id="beratKg" 
+591:                         type="number" 
+592:                         step="0.01"
+593:                         placeholder="0.00" 
+594:                         value={beratKg}
+595:                         onChange={(e) => setBeratKg(e.target.value)}
+596:                         className="font-mono" 
+597:                         disabled={isLoading}
+598:                       />
+599:                     </div>
+600:                     <div className="space-y-2">
+601:                       <Label htmlFor="volume" className="font-sans font-medium text-xs text-slate-500 uppercase tracking-wider">Volume (m³)</Label>
+602:                       <Input 
+603:                         id="volume" 
+604:                         type="number" 
+605:                         step="0.01"
+606:                         placeholder="0.00" 
+607:                         value={volume}
+608:                         onChange={(e) => setVolume(e.target.value)}
+609:                         className="font-mono" 
+610:                         disabled={isLoading}
+611:                       />
+612:                     </div>
+613:                     <div className="space-y-2">
+614:                       <Label htmlFor="koli" className="font-sans font-medium text-xs text-slate-500 uppercase tracking-wider">Koli (Qty)</Label>
+615:                       <Input 
+616:                         id="koli" 
+617:                         type="number" 
+618:                         placeholder="0" 
+619:                         value={qtyKoli}
+620:                         onChange={(e) => setQtyKoli(e.target.value)}
+621:                         className="font-mono" 
+622:                         disabled={isLoading}
+623:                       />
+624:                     </div>
+625:                   </div>
+626:               </CardContent>
+627:             </Card>
+628:           </div>
+629: 
+630:           {/* Right Column */}
+631:           <div className="space-y-6">
+632:             
+633:             {/* Card 4: Informasi Armada & Vendor */}
+634:             <Card className="shadow-sm border-teal-100">
+635:               <CardHeader className="pb-4 border-b border-teal-50 mb-4 bg-teal-50/30">
+636:                 <CardTitle className="font-sans text-lg text-teal-800">4. Informasi Armada & Vendor</CardTitle>
+637:               </CardHeader>
+638:               <CardContent className="space-y-4">
+639:                 <div className="grid grid-cols-2 gap-4">
+640:                     <div className="space-y-2">
+641:                         <Label htmlFor="nopol" className="font-sans font-medium">No. Plat / Nopol</Label>
+642:                         <Input 
+643:                             id="nopol" 
+644:                             placeholder="B 1234 CD" 
+645:                             value={newNopol}
+646:                             onChange={(e) => setNewNopol(e.target.value.toUpperCase())}
+647:                             className="font-mono uppercase font-semibold" 
+648:                             disabled={isLoading}
+649:                         />
+650:                     </div>
+651:                     {isFTL && (
+652:                         <div className="space-y-2 animate-in fade-in zoom-in-95 duration-200">
+653:                             <Label htmlFor="jenisUnit" className="font-sans font-medium text-teal-700">Jenis Unit</Label>
+654:                             <Input 
+655:                                 id="jenisUnit" 
+656:                                 placeholder="CDD / FUSO / Tronton" 
+657:                                 value={jenisUnit}
+658:                                 onChange={(e) => setJenisUnit(e.target.value)}
+659:                                 className="font-sans" 
+660:                                 disabled={isLoading}
+661:                             />
+662:                         </div>
+663:                     )}
+664:                 </div>
+665: 
+666:                 <div className="grid grid-cols-2 gap-4">
+667:                     <div className="space-y-2">
+668:                       <Label htmlFor="driver" className="font-sans font-medium">Nama Driver</Label>
+669:                       <Input 
+670:                         id="driver" 
+671:                         placeholder="Nama lengkap" 
+672:                         value={driverName}
+673:                         onChange={(e) => setDriverName(e.target.value)}
+674:                         className="font-sans" 
+675:                         disabled={isLoading}
+676:                       />
+677:                     </div>
+678:                     <div className="space-y-2">
+679:                       <Label htmlFor="driverPhone" className="font-sans font-medium">No. Driver</Label>
+680:                       <Input 
+681:                         id="driverPhone" 
+682:                         placeholder="0812..." 
+683:                         value={driverPhone}
+684:                         onChange={(e) => setDriverPhone(e.target.value)}
+685:                         className="font-mono" 
+686:                         disabled={isLoading}
+687:                       />
+688:                     </div>
+689:                 </div>
+690: 
+691:                 {isFTL && (
+692:                     <div className="grid grid-cols-2 gap-4 pt-2 border-t border-teal-50 animate-in fade-in slide-in-from-top-2 duration-300">
+693:                         <div className="space-y-2">
+694:                             <Label htmlFor="vendorPrice" className="font-sans font-medium text-teal-700">Harga Vendor</Label>
+695:                             <select 
+696:                                 id="vendorPrice" 
+697:                                 value={vendorPrice}
+698:                                 onChange={(e) => setVendorPrice(e.target.value)}
+699:                                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring font-sans"
+700:                                 disabled={isLoading}
+701:                             >
+702:                                 <option value="">Pilih Harga Vendor...</option>
+703:                                 {VENDOR_PRICE_OPTIONS.map((opt) => (
+704:                                     <option key={opt} value={opt}>{opt}</option>
+705:                                 ))}
+706:                             </select>
+707:                         </div>
+708:                         <div className="space-y-2">
+709:                             <Label htmlFor="monitoringPj" className="font-sans font-medium text-teal-700">PJ Monitoring</Label>
+710:                             <Input 
+711:                                 id="monitoringPj" 
+712:                                 placeholder="Nama staff monitoring" 
+713:                                 value={monitoringPj}
+714:                                 onChange={(e) => setMonitoringPj(e.target.value)}
+715:                                 className="font-sans" 
+716:                                 disabled={isLoading}
+717:                             />
+718:                         </div>
+719:                     </div>
+720:                 )}
+721:               </CardContent>
+722:             </Card>
+723: 
+724:             {/* Card 5: Penyelesaian & Biaya */}
+725:             <Card className="shadow-sm border-blue-100">
+726:               <CardHeader className="pb-4 border-b border-blue-50 mb-4 bg-blue-50/30">
+727:                 <CardTitle className="font-sans text-lg text-blue-800">5. Penyelesaian & Biaya</CardTitle>
+728:               </CardHeader>
+729:               <CardContent className="space-y-4">
+730:                 <div className="grid grid-cols-2 gap-4">
+731:                     <div className="space-y-2">
+732:                         <Label htmlFor="tkbm" className="font-sans font-medium">TKBM (Deskripsi/Nominal)</Label>
+733:                         <Input 
+734:                             id="tkbm" 
+735:                             placeholder="Kuli muat Rp 50.000" 
+736:                             value={tkbm}
+737:                             onChange={(e) => setTkbm(e.target.value)}
+738:                             className="font-sans" 
+739:                             disabled={isLoading}
+740:                         />
+741:                     </div>
+742:                     <div className="space-y-2">
+743:                         <Label htmlFor="omset" className="font-sans font-medium">Omset (Pendapatan)</Label>
+744:                         <Input 
+745:                             id="omset" 
+746:                             type="number"
+747:                             placeholder="0" 
+748:                             value={omset}
+749:                             onChange={(e) => setOmset(e.target.value)}
+750:                             className="font-mono text-green-700 bg-green-50/30" 
+751:                             disabled={isLoading}
+752:                         />
+753:                     </div>
+754:                 </div>
+755: 
+756:                 <div className="space-y-2">
+757:                     <Label htmlFor="tglDiterima" className="font-sans font-medium">Tanggal Diterima</Label>
+758:                     <Input 
+759:                         id="tglDiterima" 
+760:                         type="date"
+761:                         value={tglDiterima}
+762:                         onChange={(e) => setTglDiterima(e.target.value)}
+763:                         className="font-sans"
+764:                         disabled={isLoading}
+765:                     />
+766:                 </div>
+767: 
+768:                 <div className="space-y-2">
+769:                   <Label htmlFor="keterangan" className="font-sans font-medium">Keterangan / Catatan Tambahan</Label>
+770:                   <Textarea 
+771:                     id="keterangan" 
+772:                     placeholder="Catatan..." 
+773:                     value={keteranganCustom}
+774:                     onChange={(e) => setKeteranganCustom(e.target.value)}
+775:                     className="resize-none font-sans text-sm"
+776:                     rows={3}
+777:                     disabled={isLoading}
+778:                   />
+779:                 </div>
+780:               </CardContent>
+781:             </Card>
+782: 
+783:             {/* Card 6: Indikator KPI & Evaluasi */}
+784:             <Card className="shadow-sm border-purple-100">
+785:               <CardHeader className="pb-4 border-b border-purple-50 mb-4 bg-purple-50/30">
+786:                 <CardTitle className="font-sans text-lg text-purple-800">6. Indikator KPI & Evaluasi</CardTitle>
+787:               </CardHeader>
+788:               <CardContent className="space-y-4">
+789:                 <div className="grid grid-cols-2 gap-4">
+790:                   <div className="space-y-2">
+791:                     <Label htmlFor="rateSla" className="font-sans font-medium text-purple-700">Rate SLA</Label>
+792:                     <select 
+793:                         id="rateSla" 
+794:                         value={rateSla}
+795:                         onChange={(e) => setRateSla(e.target.value)}
+796:                         className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring font-sans"
+797:                         disabled={isLoading}
+798:                     >
+799:                         <option value="">Pilih Evaluasi SLA...</option>
+800:                         <option value="Sesuai SLA">Sesuai SLA</option>
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.

@@ -1,0 +1,103 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { createClient } from "@/utils/supabase/client";
+import { FormInputFtl } from "@/components/pos/FormInputFtl";
+import { FormInputLtlLcl } from "@/components/pos/FormInputLtlLcl";
+
+export default function PosPage() {
+  const supabase = createClient();
+  const [userPermissions, setUserPermissions] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchPermissions() {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data } = await supabase
+            .from('user_permissions')
+            .select('*')
+            .eq('user_id', user.id)
+            .single();
+          if (data) {
+            setUserPermissions(data);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch permissions", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchPermissions();
+  }, [supabase]);
+
+  if (isLoading) {
+    return (
+      <div className="flex-1 flex items-center justify-center p-8 text-slate-500">
+        Memuat antarmuka operasional...
+      </div>
+    );
+  }
+
+  // Evaluasi Hak Akses
+  const hasAccessFtl = userPermissions?.can_access_ftl;
+  const hasAccessLtlLcl = userPermissions?.can_access_ltl || userPermissions?.can_access_lcl;
+
+  // Jika tidak punya akses sama sekali
+  if (!hasAccessFtl && !hasAccessLtlLcl) {
+    return (
+      <div className="flex-1 p-8 text-center text-slate-500 flex flex-col items-center justify-center">
+        <h2 className="text-xl font-bold mb-2">Akses Ditolak</h2>
+        <p>Anda belum memiliki akses ke layanan operasional mana pun. Hubungi Admin.</p>
+      </div>
+    );
+  }
+
+  // Render Section bersusun (tanpa Tab Menu)
+  return (
+    <div className="flex-1 space-y-6 p-8 pt-6 overflow-y-auto bg-slate-50">
+      <div className="flex items-center justify-between space-y-2 mb-6">
+        <h2 className="text-3xl font-bold tracking-tight font-sans text-slate-800">
+          Delivery Management (POS)
+        </h2>
+      </div>
+
+      <div className="flex flex-col gap-10 w-full pb-10">
+        
+        {/* SECTION 1: Form FTL (Berbasis Armada/Driver) */}
+        {hasAccessFtl && (
+          <section className="w-full">
+            <div className="mb-4">
+              <h2 className="text-2xl font-bold text-slate-800 border-b-2 border-orange-500 pb-2 inline-block">
+                Operasional FTL (Full Truck Load)
+              </h2>
+            </div>
+            {/* Render Komponen FTL di sini */}
+            <FormInputFtl />
+          </section>
+        )}
+
+        {/* Pembatas Visual (Hanya muncul jika user punya kedua akses) */}
+        {hasAccessFtl && hasAccessLtlLcl && (
+          <hr className="border-t-2 border-slate-200 border-dashed my-4" />
+        )}
+
+        {/* SECTION 2: Form LTL / LCL (Berbasis STT) */}
+        {hasAccessLtlLcl && (
+          <section className="w-full">
+            <div className="mb-4">
+              <h2 className="text-2xl font-bold text-slate-800 border-b-2 border-indigo-500 pb-2 inline-block">
+                Operasional LTL / LCL
+              </h2>
+            </div>
+            {/* Render Komponen LTL/LCL di sini */}
+            <FormInputLtlLcl />
+          </section>
+        )}
+
+      </div>
+    </div>
+  );
+}

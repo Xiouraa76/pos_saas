@@ -1,0 +1,388 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>cAm LOGISTICS - Reports</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-lowest": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "tertiary": "#565e74",
+                        "surface-container-high": "#dce9ff",
+                        "inverse-primary": "#ffb693",
+                        "on-surface": "#0b1c30",
+                        "on-tertiary-container": "#293045",
+                        "on-surface-variant": "#5a4136",
+                        "primary-fixed-dim": "#ffb693",
+                        "outline-variant": "#e2bfb0",
+                        "on-primary-fixed": "#351000",
+                        "error-container": "#ffdad6",
+                        "tertiary-container": "#9198b1",
+                        "tertiary-fixed-dim": "#bec6e0",
+                        "surface-variant": "#d3e4fe",
+                        "surface-dim": "#cbdbf5",
+                        "tertiary-fixed": "#dae2fd",
+                        "surface-container": "#e5eeff",
+                        "surface": "#f8f9ff",
+                        "surface-container-low": "#eff4ff",
+                        "background": "#f8f9ff",
+                        "surface-tint": "#a04100",
+                        "inverse-surface": "#213145",
+                        "on-primary-container": "#572000",
+                        "surface-bright": "#f8f9ff",
+                        "on-primary-fixed-variant": "#7a3000",
+                        "primary-container": "#ff6b00",
+                        "on-tertiary-fixed-variant": "#3f465c",
+                        "on-secondary-fixed": "#1a1c1c",
+                        "on-tertiary": "#ffffff",
+                        "outline": "#8e7164",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed": "#ffdbcc",
+                        "on-error": "#ffffff",
+                        "on-secondary-container": "#616363",
+                        "on-secondary-fixed-variant": "#454747",
+                        "secondary-fixed-dim": "#c6c6c7",
+                        "primary": "#a04100",
+                        "on-background": "#0b1c30",
+                        "inverse-on-surface": "#eaf1ff",
+                        "secondary": "#5d5f5f",
+                        "error": "#ba1a1a",
+                        "secondary-fixed": "#e2e2e2",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-tertiary-fixed": "#131b2e",
+                        "secondary-container": "#dfe0e0",
+                        "on-primary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "xl": "32px",
+                        "md": "16px",
+                        "gutter": "16px",
+                        "base": "4px",
+                        "sm": "8px",
+                        "margin-desktop": "32px",
+                        "lg": "24px",
+                        "xs": "4px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Inter"],
+                        "label-md": ["JetBrains Mono"],
+                        "headline-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-sm": ["JetBrains Mono"],
+                        "headline-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "label-md": ["13px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #F8FAFC; } /* Base Slate 50 from guidance */
+        /* Data table specifics */
+        .table-row-hover:hover { background-color: #F8FAFC; }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex">
+<!-- SideNavBar -->
+<nav class="hidden md:flex flex-col h-screen p-md gap-sm bg-surface-container-lowest border-r border-outline-variant fixed left-0 top-0 w-[240px] z-40 shadow-sm">
+<div class="mb-lg">
+<div class="flex items-center gap-sm">
+<img class="w-10 h-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDmMGwDabVyK0NLD60LFbqoSWdEoNmk76E3s33Rnq6sQgE7GANAmnfPVFWWS7J_rSYGZXtugV4-Q2fL436pdA3k29C8G33_xS1G4YHylUTwndlJACMtDr47SLu4_Vv7_bL7P9afxuQmIMWVrq6oDWoP15BVnP4w7qdGSsROuf6voTBxMbIUvAOWSRssRybefqfbLbt4h8um_ToW2u3nzbMWIgovayGpo_VqOzJHi_vz8xhMI2sGU6oOn7FA9yYp0f2tDM4" alt="cAm LOGISTICS Logo">
+<div>
+<h1 class="font-headline-sm text-headline-sm font-black text-primary">cAm LOGISTICS</h1>
+<p class="font-label-sm text-label-sm text-secondary">Command Center</p>
+</div>
+</div>
+</div>
+<button class="w-full bg-primary-container text-on-primary-container hover:bg-[#e66000] font-label-md text-label-md py-sm px-md rounded-DEFAULT flex items-center justify-center gap-sm transition-colors mb-sm">
+<span class="material-symbols-outlined text-sm">add</span> New Shipment
+        </button>
+<div class="flex-1 flex flex-col gap-xs">
+<a class="flex items-center gap-sm p-sm rounded-lg text-secondary font-medium hover:bg-secondary-container hover:text-on-secondary-container transition-all hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-sm p-sm rounded-lg text-secondary font-medium hover:bg-secondary-container hover:text-on-secondary-container transition-all hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">local_shipping</span>
+<span class="font-label-md text-label-md">Delivery List</span>
+</a>
+<a class="flex items-center gap-sm p-sm rounded-lg text-secondary font-medium hover:bg-secondary-container hover:text-on-secondary-container transition-all hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">sync</span>
+<span class="font-label-md text-label-md">Data Sync</span>
+</a>
+<!-- Active State -->
+<a class="flex items-center gap-sm p-sm rounded-lg bg-primary-container text-on-primary-container font-bold hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">assessment</span>
+<span class="font-label-md text-label-md">Reports</span>
+</a>
+<a class="flex items-center gap-sm p-sm rounded-lg text-secondary font-medium hover:bg-secondary-container hover:text-on-secondary-container transition-all hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-md text-label-md">User Management</span>
+</a>
+</div>
+<div class="mt-auto flex flex-col gap-xs border-t border-outline-variant pt-sm">
+<a class="flex items-center gap-sm p-sm rounded-lg text-secondary font-medium hover:bg-secondary-container hover:text-on-secondary-container transition-all hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-md text-label-md">Support</span>
+</a>
+<a class="flex items-center gap-sm p-sm rounded-lg text-secondary font-medium hover:bg-secondary-container hover:text-on-secondary-container transition-all hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-md text-label-md">Sign Out</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 ml-0 md:ml-[240px] flex flex-col h-screen overflow-hidden">
+<!-- TopNavBar -->
+<header class="fixed top-0 right-0 left-0 md:left-[240px] z-30 flex items-center justify-between px-margin-desktop h-16 bg-surface-container-lowest border-b border-outline-variant shadow-sm transition-all">
+<div class="flex items-center gap-md">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-secondary text-sm">search</span>
+<input class="pl-xl pr-sm py-xs w-64 bg-surface rounded-DEFAULT border border-[#E2E8F0] focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all font-body-sm text-body-sm text-on-surface" placeholder="Search reports..." type="text">
+</div>
+</div>
+<div class="flex items-center gap-sm">
+<button class="p-xs text-on-surface-variant hover:bg-surface-container-low transition-colors cursor-pointer active:scale-95 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-xs text-on-surface-variant hover:bg-surface-container-low transition-colors cursor-pointer active:scale-95 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="ml-sm border-l border-outline-variant pl-sm">
+<img alt="Operations Manager Profile" class="w-8 h-8 rounded-full object-cover border border-[#E2E8F0] cursor-pointer" data-alt="Professional headshot of an operations manager in a corporate setting. The manager is looking confidently at the camera, lit with bright, clear lighting against a neutral light grey background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCxDokGanHtmQKfAOtlD_jw_osQB2NGQPkIa8xfm9pg66KMj3VFHe24MeCSCa9FYFaZRfyFNT_qS6wWDrt6KkkycQo-y45cqtemcbh4DM69BB0ddh36k_DuXgYg8AJ7Wy_2UZfucSucQbWPY1gApOPiUeUWYlhxQ4Yyo8ePnbSers7avQZg4tZIHOBXbSaDGZ7dKKczUjmcL-b1X9Kjl2ccKdxp_UN34x-1ZlnQvTQZTXjhYgZkMdukSw">
+</div>
+</div>
+</header>
+<!-- Scrollable Content -->
+<main class="flex-1 overflow-y-auto mt-16 p-margin-mobile md:p-margin-desktop">
+<div class="mb-lg flex flex-col sm:flex-row sm:items-center justify-between gap-md">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Reports &amp; Analytics</h2>
+<p class="font-body-md text-body-md text-secondary mt-base">Generate, view, and export high-performance operational metrics.</p>
+</div>
+<div class="flex gap-sm">
+<button class="px-md py-sm bg-surface-container-lowest border border-[#E2E8F0] rounded-DEFAULT font-label-md text-label-md text-on-surface hover:shadow-sm transition-shadow flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">save_alt</span> Save Layout
+                    </button>
+<button class="px-md py-sm bg-primary-container text-on-primary-container rounded-DEFAULT font-label-md text-label-md hover:bg-[#e66000] transition-colors flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">download</span> Export Selected
+                    </button>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter mb-xl">
+<!-- Report Configuration Card -->
+<div class="col-span-1 lg:col-span-4 bg-surface-container-lowest border border-[#E2E8F0] rounded-lg p-md hover:shadow-sm transition-shadow">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-md flex items-center gap-xs border-b border-outline-variant pb-sm">
+<span class="material-symbols-outlined text-primary">tune</span> Report Configuration
+                    </h3>
+<div class="space-y-md">
+<div>
+<label class="block font-label-sm text-label-sm text-secondary mb-base">Report Type</label>
+<select class="w-full bg-surface border border-[#E2E8F0] rounded-DEFAULT p-sm font-body-sm text-body-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all">
+<option>Vendor Performance Matrix</option>
+<option>Transit Time Analysis</option>
+<option>Cost per Route Summary</option>
+<option>Exception Tracking</option>
+</select>
+</div>
+<div>
+<label class="block font-label-sm text-label-sm text-secondary mb-base">Date Range</label>
+<div class="flex gap-sm">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-secondary text-[16px]">calendar_today</span>
+<input class="w-full pl-lg pr-sm py-sm bg-surface border border-[#E2E8F0] rounded-DEFAULT font-label-sm text-label-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all" type="text" value="Oct 1, 2023">
+</div>
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-secondary text-[16px]">calendar_today</span>
+<input class="w-full pl-lg pr-sm py-sm bg-surface border border-[#E2E8F0] rounded-DEFAULT font-label-sm text-label-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all" type="text" value="Oct 31, 2023">
+</div>
+</div>
+</div>
+<div>
+<label class="block font-label-sm text-label-sm text-secondary mb-base">Filters (Vendors)</label>
+<div class="flex flex-wrap gap-xs">
+<span class="inline-flex items-center gap-xs px-sm py-xs bg-surface-container-high border border-outline-variant rounded-full font-label-sm text-label-sm text-on-surface cursor-pointer hover:bg-surface-variant transition-colors">
+                                    Alpha Transit <span class="material-symbols-outlined text-[14px]">close</span>
+</span>
+<span class="inline-flex items-center gap-xs px-sm py-xs bg-surface-container-high border border-outline-variant rounded-full font-label-sm text-label-sm text-on-surface cursor-pointer hover:bg-surface-variant transition-colors">
+                                    Bravo Freight <span class="material-symbols-outlined text-[14px]">close</span>
+</span>
+<span class="inline-flex items-center gap-xs px-sm py-xs bg-surface border border-dashed border-[#E2E8F0] rounded-full font-label-sm text-label-sm text-secondary cursor-pointer hover:border-primary transition-colors">
+<span class="material-symbols-outlined text-[14px]">add</span> Add Filter
+                                </span>
+</div>
+</div>
+<div class="pt-sm border-t border-outline-variant mt-sm">
+<button class="w-full py-sm bg-surface-container-lowest border border-[#E2E8F0] rounded-DEFAULT font-label-md text-label-md text-on-surface hover:border-primary transition-colors flex items-center justify-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">autorenew</span> Generate Report
+                            </button>
+</div>
+</div>
+</div>
+<!-- Vendor Performance Chart Placeholder -->
+<div class="col-span-1 lg:col-span-8 bg-surface-container-lowest border border-[#E2E8F0] rounded-lg p-md hover:shadow-sm transition-shadow flex flex-col">
+<div class="flex justify-between items-center mb-md border-b border-outline-variant pb-sm">
+<h3 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-xs">
+<span class="material-symbols-outlined text-secondary">show_chart</span> Vendor Performance Trends
+                        </h3>
+<span class="font-label-sm text-label-sm text-secondary bg-surface px-xs py-base rounded-sm border border-[#E2E8F0]">On-Time Delivery %</span>
+</div>
+<div class="flex-1 w-full bg-surface-container-low rounded-DEFAULT border border-dashed border-[#E2E8F0] flex flex-col items-center justify-center relative overflow-hidden min-h-[300px]">
+<!-- Abstract Line Chart Visualization -->
+<div class="absolute inset-0 p-lg flex items-end opacity-70">
+<!-- Y-axis lines -->
+<div class="absolute left-0 top-0 bottom-0 w-full flex flex-col justify-between px-lg py-md opacity-20 pointer-events-none">
+<div class="w-full border-t border-tertiary-container border-dashed h-0"></div>
+<div class="w-full border-t border-tertiary-container border-dashed h-0"></div>
+<div class="w-full border-t border-tertiary-container border-dashed h-0"></div>
+<div class="w-full border-t border-tertiary-container border-dashed h-0"></div>
+<div class="w-full border-t border-tertiary-container border-solid h-0"></div>
+</div>
+<!-- SVGs for lines -->
+<svg class="w-full h-full relative z-10" preserveAspectRatio="none" viewBox="0 0 100 100">
+<path d="M0,80 Q20,60 40,75 T80,40 T100,20" fill="none" stroke="#ff6b00" stroke-linecap="round" stroke-width="2"></path>
+<path d="M0,90 Q30,85 50,60 T90,50 T100,45" fill="none" stroke="#9198b1" stroke-dasharray="4 4" stroke-linecap="round" stroke-width="1.5"></path>
+<!-- Data points -->
+<circle cx="40" cy="75" fill="#ffffff" r="1.5" stroke="#ff6b00" stroke-width="1"></circle>
+<circle cx="80" cy="40" fill="#ffffff" r="1.5" stroke="#ff6b00" stroke-width="1"></circle>
+<circle cx="100" cy="20" fill="#ffffff" r="1.5" stroke="#ff6b00" stroke-width="1"></circle>
+</svg>
+</div>
+<div class="z-20 flex items-center gap-xs text-secondary font-label-md text-label-md bg-surface-container-lowest/80 px-sm py-xs rounded-full border border-outline-variant backdrop-blur-sm">
+                            Interactive Chart Component Active
+                        </div>
+</div>
+</div>
+</div>
+<!-- Data Preview Table -->
+<div class="bg-surface-container-lowest border border-[#E2E8F0] rounded-lg hover:shadow-sm transition-shadow overflow-hidden">
+<div class="p-md border-b border-[#E2E8F0] flex justify-between items-center bg-surface-container-lowest sticky top-0 z-10">
+<h3 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-xs">
+<span class="material-symbols-outlined text-secondary">table_view</span> Data Preview (1-10 of 420)
+                    </h3>
+<div class="flex gap-sm">
+<button class="p-xs text-secondary hover:bg-surface-container-low rounded-DEFAULT transition-colors">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+</button>
+<button class="p-xs text-secondary hover:bg-surface-container-low rounded-DEFAULT transition-colors">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-[#F8FAFC] border-b border-[#E2E8F0]">
+<th class="py-sm px-md font-label-sm text-label-sm text-secondary uppercase tracking-wider">Vendor ID</th>
+<th class="py-sm px-md font-label-sm text-label-sm text-secondary uppercase tracking-wider">Vendor Name</th>
+<th class="py-sm px-md font-label-sm text-label-sm text-secondary uppercase tracking-wider">Total Shipments</th>
+<th class="py-sm px-md font-label-sm text-label-sm text-secondary uppercase tracking-wider">On-Time %</th>
+<th class="py-sm px-md font-label-sm text-label-sm text-secondary uppercase tracking-wider">Exception Rate</th>
+<th class="py-sm px-md font-label-sm text-label-sm text-secondary uppercase tracking-wider">Avg Cost/Route</th>
+<th class="py-sm px-md font-label-sm text-label-sm text-secondary uppercase tracking-wider text-right">Status</th>
+</tr>
+</thead>
+<tbody class="font-body-sm text-body-sm text-on-surface">
+<tr class="border-b border-[#E2E8F0] table-row-hover transition-colors">
+<td class="py-xs px-md font-label-md text-secondary">V-8821</td>
+<td class="py-xs px-md font-medium text-on-surface">Alpha Transit</td>
+<td class="py-xs px-md font-label-md text-secondary">1,245</td>
+<td class="py-xs px-md font-label-md text-on-surface font-semibold">98.2%</td>
+<td class="py-xs px-md font-label-md text-secondary">1.8%</td>
+<td class="py-xs px-md font-label-md text-secondary">$450.00</td>
+<td class="py-xs px-md text-right">
+<span class="inline-flex items-center px-2 py-1 rounded-sm text-[10px] font-bold bg-[#dcfce7] text-[#166534] font-label-sm border border-[#bbf7d0]">OPTIMAL</span>
+</td>
+</tr>
+<tr class="border-b border-[#E2E8F0] bg-surface table-row-hover transition-colors">
+<td class="py-xs px-md font-label-md text-secondary">V-3309</td>
+<td class="py-xs px-md font-medium text-on-surface">Bravo Freight</td>
+<td class="py-xs px-md font-label-md text-secondary">890</td>
+<td class="py-xs px-md font-label-md text-on-surface font-semibold">94.5%</td>
+<td class="py-xs px-md font-label-md text-secondary">5.5%</td>
+<td class="py-xs px-md font-label-md text-secondary">$410.50</td>
+<td class="py-xs px-md text-right">
+<span class="inline-flex items-center px-2 py-1 rounded-sm text-[10px] font-bold bg-[#fef08a] text-[#854d0e] font-label-sm border border-[#fde047]">REVIEW</span>
+</td>
+</tr>
+<tr class="border-b border-[#E2E8F0] table-row-hover transition-colors">
+<td class="py-xs px-md font-label-md text-secondary">V-7742</td>
+<td class="py-xs px-md font-medium text-on-surface">Charlie Logistics</td>
+<td class="py-xs px-md font-label-md text-secondary">2,100</td>
+<td class="py-xs px-md font-label-md text-on-surface font-semibold">96.8%</td>
+<td class="py-xs px-md font-label-md text-secondary">3.2%</td>
+<td class="py-xs px-md font-label-md text-secondary">$395.00</td>
+<td class="py-xs px-md text-right">
+<span class="inline-flex items-center px-2 py-1 rounded-sm text-[10px] font-bold bg-[#dcfce7] text-[#166534] font-label-sm border border-[#bbf7d0]">OPTIMAL</span>
+</td>
+</tr>
+<tr class="border-b border-[#E2E8F0] bg-surface table-row-hover transition-colors">
+<td class="py-xs px-md font-label-md text-secondary">V-1104</td>
+<td class="py-xs px-md font-medium text-on-surface">Delta Express</td>
+<td class="py-xs px-md font-label-md text-secondary">450</td>
+<td class="py-xs px-md font-label-md text-[#ba1a1a] font-semibold">88.1%</td>
+<td class="py-xs px-md font-label-md text-secondary">11.9%</td>
+<td class="py-xs px-md font-label-md text-secondary">$520.00</td>
+<td class="py-xs px-md text-right">
+<span class="inline-flex items-center px-2 py-1 rounded-sm text-[10px] font-bold bg-error-container text-on-error-container font-label-sm border border-[#fecaca]">CRITICAL</span>
+</td>
+</tr>
+<tr class="border-b border-[#E2E8F0] table-row-hover transition-colors">
+<td class="py-xs px-md font-label-md text-secondary">V-9930</td>
+<td class="py-xs px-md font-medium text-on-surface">Echo Shipping</td>
+<td class="py-xs px-md font-label-md text-secondary">1,850</td>
+<td class="py-xs px-md font-label-md text-on-surface font-semibold">97.5%</td>
+<td class="py-xs px-md font-label-md text-secondary">2.5%</td>
+<td class="py-xs px-md font-label-md text-secondary">$460.00</td>
+<td class="py-xs px-md text-right">
+<span class="inline-flex items-center px-2 py-1 rounded-sm text-[10px] font-bold bg-[#dcfce7] text-[#166534] font-label-sm border border-[#bbf7d0]">OPTIMAL</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-sm bg-[#F8FAFC] border-t border-[#E2E8F0] flex items-center justify-between">
+<span class="font-body-sm text-body-sm text-secondary">Showing 1 to 5 of 420 entries</span>
+<div class="flex gap-xs">
+<button class="px-sm py-xs border border-[#E2E8F0] rounded-DEFAULT font-label-sm text-secondary hover:bg-surface transition-colors disabled:opacity-50" disabled="">Prev</button>
+<button class="px-sm py-xs border border-primary bg-primary text-white rounded-DEFAULT font-label-sm">1</button>
+<button class="px-sm py-xs border border-[#E2E8F0] rounded-DEFAULT font-label-sm text-secondary hover:bg-surface transition-colors">2</button>
+<button class="px-sm py-xs border border-[#E2E8F0] rounded-DEFAULT font-label-sm text-secondary hover:bg-surface transition-colors">Next</button>
+</div>
+</div>
+</div>
+<!-- Footer Padding -->
+<div class="h-xl"></div>
+</main>
+</div>
+
+
+</body></html>

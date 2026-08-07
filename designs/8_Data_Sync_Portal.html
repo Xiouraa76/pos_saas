@@ -1,0 +1,319 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>cAm LOGISTICS - Data Synchronization</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-lowest": "#ffffff",
+                      "on-error-container": "#93000a",
+                      "tertiary": "#565e74",
+                      "surface-container-high": "#dce9ff",
+                      "inverse-primary": "#ffb693",
+                      "on-surface": "#0b1c30",
+                      "on-tertiary-container": "#293045",
+                      "on-surface-variant": "#5a4136",
+                      "primary-fixed-dim": "#ffb693",
+                      "outline-variant": "#e2bfb0",
+                      "on-primary-fixed": "#351000",
+                      "error-container": "#ffdad6",
+                      "tertiary-container": "#9198b1",
+                      "tertiary-fixed-dim": "#bec6e0",
+                      "surface-variant": "#d3e4fe",
+                      "surface-dim": "#cbdbf5",
+                      "tertiary-fixed": "#dae2fd",
+                      "surface-container": "#e5eeff",
+                      "surface": "#f8f9ff",
+                      "surface-container-low": "#eff4ff",
+                      "background": "#f8f9ff",
+                      "surface-tint": "#a04100",
+                      "inverse-surface": "#213145",
+                      "on-primary-container": "#572000",
+                      "surface-bright": "#f8f9ff",
+                      "on-primary-fixed-variant": "#7a3000",
+                      "primary-container": "#ff6b00",
+                      "on-tertiary-fixed-variant": "#3f465c",
+                      "on-secondary-fixed": "#1a1c1c",
+                      "on-tertiary": "#ffffff",
+                      "outline": "#8e7164",
+                      "on-secondary": "#ffffff",
+                      "primary-fixed": "#ffdbcc",
+                      "on-error": "#ffffff",
+                      "on-secondary-container": "#616363",
+                      "on-secondary-fixed-variant": "#454747",
+                      "secondary-fixed-dim": "#c6c6c7",
+                      "primary": "#a04100",
+                      "on-background": "#0b1c30",
+                      "inverse-on-surface": "#eaf1ff",
+                      "secondary": "#5d5f5f",
+                      "error": "#ba1a1a",
+                      "secondary-fixed": "#e2e2e2",
+                      "surface-container-highest": "#d3e4fe",
+                      "on-tertiary-fixed": "#131b2e",
+                      "secondary-container": "#dfe0e0",
+                      "on-primary": "#ffffff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "xl": "32px",
+                      "md": "16px",
+                      "gutter": "16px",
+                      "base": "4px",
+                      "sm": "8px",
+                      "margin-desktop": "32px",
+                      "lg": "24px",
+                      "xs": "4px",
+                      "margin-mobile": "16px"
+              },
+              "fontFamily": {
+                      "headline-lg-mobile": ["Inter"],
+                      "label-md": ["JetBrains Mono"],
+                      "headline-md": ["Inter"],
+                      "headline-lg": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "body-sm": ["Inter"],
+                      "body-md": ["Inter"],
+                      "label-sm": ["JetBrains Mono"],
+                      "headline-sm": ["Inter"]
+              },
+              "fontSize": {
+                      "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                      "label-md": ["13px", {"lineHeight": "16px", "fontWeight": "500"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "body-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "label-sm": ["11px", {"lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                      "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}]
+              }
+            }
+          }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md h-screen flex overflow-hidden">
+<!-- SideNavBar -->
+<aside class="flex flex-col h-screen p-md gap-sm bg-surface-container-lowest dark:bg-surface-dim border-r border-outline-variant dark:border-outline fixed left-0 top-0 w-[240px] z-40 hidden md:flex">
+<div class="mb-lg"><img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDMn-2MzIAbA56UIesqNGCUCxy-NVQ4WeRL61Td1o3d4YLNHJciUEG_8qgW5gYCgvGsd_QKfYf42jg43DCAcpcbS0-XbEpo9RaVj0XUmwA8NBBio7l_5hP4B8WY2eS39AfhgcLRIlv-h-0xdPyFPOxfKxSudqZJ6hfQun_mI-JtbWIKaqlZBePG45eA8k82QWWKmrDwX_B64d6w7y5cdbT_aLQohpJrF91IhAdeQ_JjFGtmCzwCzyfug9JXn8vxe1G2muM" alt="cAm LOGISTICS Logo" class="h-16 w-auto object-contain"></div>
+<button class="w-full bg-primary-container text-on-primary-container font-headline-sm text-headline-sm py-sm px-md rounded-DEFAULT hover:bg-surface-tint hover:text-white transition-colors mb-md flex items-center justify-center gap-sm">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add</span>
+            New Shipment
+        </button>
+<nav class="flex-1 flex flex-col gap-base">
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-secondary dark:text-secondary-fixed font-medium hover:bg-secondary-container dark:hover:bg-secondary-fixed-dim hover:text-on-secondary-container transition-all hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-secondary dark:text-secondary-fixed font-medium hover:bg-secondary-container dark:hover:bg-secondary-fixed-dim hover:text-on-secondary-container transition-all hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">local_shipping</span>
+<span class="font-label-md text-label-md">Delivery List</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg bg-primary-container text-on-primary-container font-bold hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">sync</span>
+<span class="font-label-md text-label-md">Data Sync</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-secondary dark:text-secondary-fixed font-medium hover:bg-secondary-container dark:hover:bg-secondary-fixed-dim hover:text-on-secondary-container transition-all hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">assessment</span>
+<span class="font-label-md text-label-md">Reports</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-secondary dark:text-secondary-fixed font-medium hover:bg-secondary-container dark:hover:bg-secondary-fixed-dim hover:text-on-secondary-container transition-all hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-md text-label-md">User Management</span>
+</a>
+</nav>
+<div class="mt-auto flex flex-col gap-base border-t border-outline-variant pt-sm">
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-secondary dark:text-secondary-fixed font-medium hover:bg-secondary-container dark:hover:bg-secondary-fixed-dim hover:text-on-secondary-container transition-all hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-md text-label-md">Support</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-secondary dark:text-secondary-fixed font-medium hover:bg-secondary-container dark:hover:bg-secondary-fixed-dim hover:text-on-secondary-container transition-all hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-md text-label-md">Sign Out</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 md:ml-[240px] flex flex-col h-full overflow-hidden">
+<!-- TopNavBar -->
+<header class="fixed top-0 right-0 left-0 z-50 flex items-center justify-between px-margin-desktop h-16 ml-0 md:ml-[240px] bg-surface-container-lowest dark:bg-surface-dim border-b border-outline-variant dark:border-outline shadow-sm dark:shadow-none">
+<div class="flex items-center gap-md">
+<h2 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim md:hidden">cAm LOGISTICS</h2>
+<div class="hidden md:flex items-center bg-surface-container-low rounded-DEFAULT border border-outline-variant px-sm py-xs focus-within:border-primary focus-within:ring-2 focus-within:ring-primary-fixed transition-all w-64">
+<span class="material-symbols-outlined text-secondary mr-sm">search</span>
+<input class="bg-transparent border-none outline-none font-body-sm text-body-sm w-full placeholder-secondary" placeholder="Search logs..." type="text">
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="text-on-surface-variant hover:bg-surface-container-low transition-colors p-sm rounded-full active:scale-95">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:bg-surface-container-low transition-colors p-sm rounded-full active:scale-95">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-secondary-container overflow-hidden border border-outline-variant">
+<img alt="Operations Manager Profile" class="w-full h-full object-cover" data-alt="A close up professional headshot of an operations manager in a well lit modern logistics office setting. The lighting is bright and clean, emphasizing a corporate and efficient atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBL0GOIRUYOx6j06w1usxKdMHpWmkMGjWsbsoBqX09vPZX4n8yi7NbdCk05vJx78rRTTJKaOjQdxDWCdPVEhRgBQ7nZM66l41YsZ82bNoXxqmJ3LHq5r5Lf2KjKXOiWnNeFA5LS2hSEm4OCY3ppOFxpgXBxSIbH6fcYXFBDwusH_0_77GNyo4fp7aZXYX5CqMXXY5Bq26e2mcEaSqbwBhD4k42N_aM-Zf42VySr-s6HDozREWpahDqUvQ">
+</div>
+</div>
+</header>
+<!-- Scrollable Content -->
+<div class="flex-1 overflow-y-auto mt-16 p-margin-mobile md:p-margin-desktop bg-background">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-xl gap-md">
+<div>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-xs">Data Synchronization Portal</h2>
+<p class="font-body-md text-body-md text-secondary">Monitor integration health and trigger manual sync events.</p>
+</div>
+<button class="bg-primary-container text-on-primary-container font-headline-sm text-headline-sm py-sm px-lg rounded-DEFAULT hover:bg-surface-tint hover:text-white transition-all active:scale-95 flex items-center gap-sm shadow-sm hover:shadow-md">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">sync</span>
+                    Manual Sync Now
+                </button>
+</div>
+<!-- Top Bento Grid: Status, Health, Schedule -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter mb-xl">
+<!-- System Status Card -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-md hover:shadow-sm transition-shadow">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-sm flex items-center gap-sm border-b border-outline-variant pb-xs">
+<span class="material-symbols-outlined text-primary">router</span>
+                        System Status
+                    </h3>
+<div class="flex items-center justify-between mb-sm">
+<span class="font-body-md text-body-md text-secondary">Connection</span>
+<span class="bg-[#e6f4ea] text-[#137333] font-label-md text-label-md px-sm py-xs rounded-DEFAULT flex items-center gap-xs">
+<span class="w-2 h-2 rounded-full bg-[#137333] inline-block"></span> Connected
+                        </span>
+</div>
+<div class="flex items-center justify-between mb-sm">
+<span class="font-body-md text-body-md text-secondary">Avg Latency</span>
+<span class="font-label-md text-label-md text-on-surface">42ms</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="font-body-md text-body-md text-secondary">Active Nodes</span>
+<span class="font-label-md text-label-md text-on-surface">12/12</span>
+</div>
+</div>
+<!-- Sync Health Overview Card -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-md hover:shadow-sm transition-shadow">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-sm flex items-center gap-sm border-b border-outline-variant pb-xs">
+<span class="material-symbols-outlined text-primary">monitor_heart</span>
+                        Sync Health Overview
+                    </h3>
+<div class="flex justify-between items-end mb-sm">
+<div>
+<p class="font-label-sm text-label-sm text-secondary uppercase tracking-wider mb-xs">Records Today</p>
+<p class="font-headline-lg text-headline-lg text-on-surface">84,291</p>
+</div>
+<div class="text-right">
+<p class="font-label-sm text-label-sm text-secondary uppercase tracking-wider mb-xs">Error Rate</p>
+<p class="font-headline-md text-headline-md text-on-surface">0.02%</p>
+</div>
+</div>
+<div class="w-full bg-secondary-container h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[99.98%]"></div>
+</div>
+</div>
+<!-- Automated Schedule Card -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-md hover:shadow-sm transition-shadow">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-sm flex items-center gap-sm border-b border-outline-variant pb-xs">
+<span class="material-symbols-outlined text-primary">schedule</span>
+                        Automated Schedule
+                    </h3>
+<div class="flex items-center justify-between mb-sm">
+<span class="font-body-md text-body-md text-secondary">Next ERP Sync</span>
+<span class="font-label-md text-label-md text-on-surface">In 4 mins</span>
+</div>
+<div class="flex items-center justify-between mb-sm">
+<span class="font-body-md text-body-md text-secondary">Telematics Polling</span>
+<span class="font-label-md text-label-md text-on-surface">Every 30s</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="font-body-md text-body-md text-secondary">Daily Archival</span>
+<span class="font-label-md text-label-md text-on-surface">02:00 UTC</span>
+</div>
+</div>
+</div>
+<!-- Recent Sync Activity Table -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden flex flex-col">
+<div class="px-md py-sm border-b border-outline-variant bg-surface-container-low flex justify-between items-center">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Recent Sync Activity</h3>
+<button class="text-primary hover:text-surface-tint font-label-md text-label-md flex items-center gap-xs transition-colors">
+                        View All Logs <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface border-b border-outline-variant">
+<th class="py-sm px-md font-label-sm text-label-sm text-secondary uppercase">Timestamp</th>
+<th class="py-sm px-md font-label-sm text-label-sm text-secondary uppercase">Source</th>
+<th class="py-sm px-md font-label-sm text-label-sm text-secondary uppercase">Status</th>
+<th class="py-sm px-md font-label-sm text-label-sm text-secondary uppercase">Records Processed</th>
+<th class="py-sm px-md font-label-sm text-label-sm text-secondary uppercase">Latency</th>
+</tr>
+</thead>
+<tbody class="font-body-sm text-body-sm">
+<tr class="border-b border-outline-variant hover:bg-surface-container transition-colors">
+<td class="py-sm px-md font-label-md text-label-md text-on-surface">10:45:02 AM</td>
+<td class="py-sm px-md text-on-surface font-medium">SAP ERP Core</td>
+<td class="py-sm px-md">
+<span class="bg-[#e6f4ea] text-[#137333] font-label-sm text-label-sm px-xs py-[2px] rounded-DEFAULT">SUCCESS</span>
+</td>
+<td class="py-sm px-md font-label-md text-label-md text-on-surface">1,240</td>
+<td class="py-sm px-md font-label-md text-label-md text-secondary">320ms</td>
+</tr>
+<tr class="border-b border-outline-variant hover:bg-surface-container transition-colors">
+<td class="py-sm px-md font-label-md text-label-md text-on-surface">10:44:30 AM</td>
+<td class="py-sm px-md text-on-surface font-medium">Samsara Telematics</td>
+<td class="py-sm px-md">
+<span class="bg-[#e6f4ea] text-[#137333] font-label-sm text-label-sm px-xs py-[2px] rounded-DEFAULT">SUCCESS</span>
+</td>
+<td class="py-sm px-md font-label-md text-label-md text-on-surface">85</td>
+<td class="py-sm px-md font-label-md text-label-md text-secondary">45ms</td>
+</tr>
+<tr class="border-b border-outline-variant hover:bg-surface-container transition-colors bg-[#fff8e6]">
+<td class="py-sm px-md font-label-md text-label-md text-on-surface">10:40:15 AM</td>
+<td class="py-sm px-md text-on-surface font-medium">NOAA Weather API</td>
+<td class="py-sm px-md">
+<span class="bg-[#fef7e0] text-[#b06000] border border-[#fbbc04] font-label-sm text-label-sm px-xs py-[2px] rounded-DEFAULT">RETRY</span>
+</td>
+<td class="py-sm px-md font-label-md text-label-md text-on-surface">0</td>
+<td class="py-sm px-md font-label-md text-label-md text-secondary">1500ms</td>
+</tr>
+<tr class="border-b border-outline-variant hover:bg-surface-container transition-colors">
+<td class="py-sm px-md font-label-md text-label-md text-on-surface">10:35:00 AM</td>
+<td class="py-sm px-md text-on-surface font-medium">SAP ERP Core</td>
+<td class="py-sm px-md">
+<span class="bg-[#e6f4ea] text-[#137333] font-label-sm text-label-sm px-xs py-[2px] rounded-DEFAULT">SUCCESS</span>
+</td>
+<td class="py-sm px-md font-label-md text-label-md text-on-surface">942</td>
+<td class="py-sm px-md font-label-md text-label-md text-secondary">280ms</td>
+</tr>
+<tr class="hover:bg-surface-container transition-colors">
+<td class="py-sm px-md font-label-md text-label-md text-on-surface">10:34:30 AM</td>
+<td class="py-sm px-md text-on-surface font-medium">Samsara Telematics</td>
+<td class="py-sm px-md">
+<span class="bg-[#e6f4ea] text-[#137333] font-label-sm text-label-sm px-xs py-[2px] rounded-DEFAULT">SUCCESS</span>
+</td>
+<td class="py-sm px-md font-label-md text-label-md text-on-surface">82</td>
+<td class="py-sm px-md font-label-md text-label-md text-secondary">42ms</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
+
+
+</body></html>

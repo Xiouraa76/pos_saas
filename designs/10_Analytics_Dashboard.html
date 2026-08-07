@@ -1,0 +1,441 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Analytics Dashboard - cAm LOGISTICS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-lowest": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "tertiary": "#565e74",
+                        "surface-container-high": "#dce9ff",
+                        "inverse-primary": "#ffb693",
+                        "on-surface": "#0b1c30",
+                        "on-tertiary-container": "#293045",
+                        "on-surface-variant": "#5a4136",
+                        "primary-fixed-dim": "#ffb693",
+                        "outline-variant": "#e2bfb0",
+                        "on-primary-fixed": "#351000",
+                        "error-container": "#ffdad6",
+                        "tertiary-container": "#9198b1",
+                        "tertiary-fixed-dim": "#bec6e0",
+                        "surface-variant": "#d3e4fe",
+                        "surface-dim": "#cbdbf5",
+                        "tertiary-fixed": "#dae2fd",
+                        "surface-container": "#e5eeff",
+                        "surface": "#f8f9ff",
+                        "surface-container-low": "#eff4ff",
+                        "background": "#f8f9ff",
+                        "surface-tint": "#a04100",
+                        "inverse-surface": "#213145",
+                        "on-primary-container": "#572000",
+                        "surface-bright": "#f8f9ff",
+                        "on-primary-fixed-variant": "#7a3000",
+                        "primary-container": "#ff6b00",
+                        "on-tertiary-fixed-variant": "#3f465c",
+                        "on-secondary-fixed": "#1a1c1c",
+                        "on-tertiary": "#ffffff",
+                        "outline": "#8e7164",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed": "#ffdbcc",
+                        "on-error": "#ffffff",
+                        "on-secondary-container": "#616363",
+                        "on-secondary-fixed-variant": "#454747",
+                        "secondary-fixed-dim": "#c6c6c7",
+                        "primary": "#a04100",
+                        "on-background": "#0b1c30",
+                        "inverse-on-surface": "#eaf1ff",
+                        "secondary": "#5d5f5f",
+                        "error": "#ba1a1a",
+                        "secondary-fixed": "#e2e2e2",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-tertiary-fixed": "#131b2e",
+                        "secondary-container": "#dfe0e0",
+                        "on-primary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "xl": "32px",
+                        "md": "16px",
+                        "gutter": "16px",
+                        "base": "4px",
+                        "sm": "8px",
+                        "margin-desktop": "32px",
+                        "lg": "24px",
+                        "xs": "4px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Inter"],
+                        "label-md": ["JetBrains Mono"],
+                        "headline-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-sm": ["JetBrains Mono"],
+                        "headline-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "label-md": ["13px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8f9ff; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .material-symbols-outlined.fill { font-variation-settings: 'FILL' 1; }
+    </style>
+</head>
+<body class="text-on-background min-h-screen">
+<!-- SideNavBar -->
+<nav class="hidden md:flex flex-col h-screen p-md gap-sm fixed left-0 top-0 w-[240px] bg-surface-container-lowest border-r border-outline-variant z-40">
+<div class="mb-xl">
+<div class="mb-sm"><img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBemwJcA9xCHD4PMZb3CWsNnL3aCiKCrk-AHc6q4h1AnQ2UUB7KMXhXvK4200y5RAgJVkAKyNDIW1ngAzBzJqwQ_5lAb9ILZIwXQu3deqNUbjoOPSn52E7DDVBv6nNJiSr1GGxNFx5B1x3o69cfdLW1X95jX-u8_d7X5V2cbRnspBIzciPHsObRC2VprAFrHKciPV8RZOuYxKapSZI7FY3GwLCBXwRow6lq_dgo4nQO6nmU4Ub9EgDz1DG6VSurMzOdmUE" alt="cAm LOGISTICS" class="h-12 w-auto object-contain"></div>
+<div class="font-label-sm text-label-sm text-on-surface-variant mt-xs uppercase tracking-wider">Command Center</div>
+</div>
+<button class="w-full bg-primary hover:bg-surface-tint text-on-primary rounded-lg py-sm px-md flex items-center justify-center gap-sm transition-colors mb-md font-body-md text-body-md font-semibold">
+<span class="material-symbols-outlined">add</span>
+            New Shipment
+        </button>
+<div class="flex-1 flex flex-col gap-xs">
+<a class="flex items-center gap-md px-md py-sm bg-primary-container text-on-primary-container font-bold rounded-lg group" href="#">
+<span class="material-symbols-outlined fill">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-secondary font-medium hover:bg-secondary-container hover:text-on-secondary-container transition-all rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-200">local_shipping</span>
+<span class="font-label-md text-label-md">Delivery List</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-secondary font-medium hover:bg-secondary-container hover:text-on-secondary-container transition-all rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-200">sync</span>
+<span class="font-label-md text-label-md">Data Sync</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-secondary font-medium hover:bg-secondary-container hover:text-on-secondary-container transition-all rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-200">assessment</span>
+<span class="font-label-md text-label-md">Reports</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-secondary font-medium hover:bg-secondary-container hover:text-on-secondary-container transition-all rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-200">group</span>
+<span class="font-label-md text-label-md">User Management</span>
+</a>
+</div>
+<div class="flex flex-col gap-xs pt-md border-t border-outline-variant">
+<a class="flex items-center gap-md px-md py-sm text-secondary font-medium hover:bg-secondary-container hover:text-on-secondary-container transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-md text-label-md">Support</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-secondary font-medium hover:bg-secondary-container hover:text-on-secondary-container transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-md text-label-md">Sign Out</span>
+</a>
+</div>
+</nav>
+<!-- TopNavBar -->
+<header class="fixed top-0 right-0 left-0 z-50 flex items-center justify-between px-margin-desktop h-16 md:ml-[240px] bg-surface-container-lowest border-b border-outline-variant shadow-sm">
+<div class="md:hidden font-headline-sm text-headline-sm font-bold text-primary">cAm LOGISTICS</div>
+<div class="hidden md:flex items-center gap-sm bg-background border border-outline-variant rounded-full px-md py-xs w-96 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary-fixed-dim transition-all">
+<span class="material-symbols-outlined text-on-surface-variant">search</span>
+<input class="bg-transparent border-none focus:ring-0 w-full font-body-sm text-body-sm placeholder:text-on-surface-variant" placeholder="Search tracking ID, vehicle, or route..." type="text">
+</div>
+<div class="flex items-center gap-md">
+<button class="text-on-surface-variant hover:bg-surface-container-low p-sm rounded-full transition-colors active:scale-95">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:bg-surface-container-low p-sm rounded-full transition-colors active:scale-95">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-label-md text-label-md font-bold overflow-hidden cursor-pointer border border-outline-variant">
+<img alt="OM" class="w-full h-full object-cover" data-alt="A professional headshot of an operations manager, well-lit, corporate setting, exuding competence and reliability." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDeLjm-0WCW7Sx1u3AGGmwNnrCDDVGfYiHtmxlWeqYVRZj4994MnvcJjIQztk4idJME1SssOQqEqEgPf1q_sdGiY271TuD2MzXZPNUT9eX17UPvc_vF2gLrzsUt9IljwRN8vB_ce8-3h8m9lTusZi4F9uGov49Amist0STD6DjFvZc5vJzCiG7rFQDlL5opebOxU1hmVkZaZ8qCzNECj2eRVfxPw5K5RfyjlOVniYXT0tUMAw2p3OxzaQ">
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="pt-[80px] md:ml-[240px] px-margin-mobile md:px-margin-desktop pb-xl max-w-7xl mx-auto flex flex-col gap-xl">
+<div class="flex justify-between items-end">
+<div>
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">Analytics Overview</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-base">Real-time performance metrics for current operating cycle.</p>
+</div>
+<div class="flex gap-sm">
+<button class="flex items-center gap-xs px-sm py-xs border border-outline-variant rounded bg-surface-container-lowest font-label-sm text-label-sm hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[16px]">calendar_today</span>
+                    Last 30 Days
+                </button>
+<button class="flex items-center gap-xs px-sm py-xs border border-outline-variant rounded bg-surface-container-lowest font-label-sm text-label-sm hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[16px]">download</span>
+                    Export
+                </button>
+</div>
+</div>
+<!-- KPI Cards Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+<!-- Total Omset -->
+<div class="bg-surface-container-lowest border border-outline-variant p-md rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1)] transition-shadow">
+<div class="flex justify-between items-start mb-sm">
+<div class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wide">Total Omset</div>
+<span class="material-symbols-outlined text-primary p-xs bg-primary-fixed rounded">payments</span>
+</div>
+<div class="font-headline-lg text-headline-lg text-on-surface">Rp 4.2B</div>
+<div class="flex items-center gap-xs mt-sm font-label-sm text-label-sm text-primary">
+<span class="material-symbols-outlined text-[14px]">trending_up</span>
+<span class="">+12.5% vs last month</span>
+</div>
+</div>
+<!-- SLA Violations -->
+<div class="bg-surface-container-lowest border border-outline-variant p-md rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1)] transition-shadow border-l-4 border-l-error">
+<div class="flex justify-between items-start mb-sm">
+<div class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wide">SLA Violations</div>
+<span class="material-symbols-outlined text-error p-xs bg-error-container rounded">warning</span>
+</div>
+<div class="font-headline-lg text-headline-lg text-on-surface">24</div>
+<div class="flex items-center gap-xs mt-sm font-label-sm text-label-sm text-error">
+<span class="material-symbols-outlined text-[14px]">trending_down</span>
+<span class="">-3 compared to target</span>
+</div>
+</div>
+<!-- DO Non-STT -->
+<div class="bg-surface-container-lowest border border-outline-variant p-md rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1)] transition-shadow">
+<div class="flex justify-between items-start mb-sm">
+<div class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wide">DO Non-STT</div>
+<span class="material-symbols-outlined text-tertiary p-xs bg-tertiary-fixed rounded">pending_actions</span>
+</div>
+<div class="font-headline-lg text-headline-lg text-on-surface">142</div>
+<div class="flex items-center gap-xs mt-sm font-label-sm text-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[14px]">info</span>
+<span class="">Action required on 45</span>
+</div>
+</div>
+</div>
+<!-- Bento Grid Layout for Charts & Feed -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-md">
+<!-- Delivery Performance Chart (Spans 2 cols) -->
+<div class="lg:col-span-2 bg-surface-container-lowest border border-outline-variant rounded-lg p-md shadow-[0_1px_3px_rgba(0,0,0,0.05)] flex flex-col">
+<div class="flex justify-between items-center mb-md">
+<h2 class="font-headline-sm text-headline-sm font-semibold">Delivery Performance</h2>
+<div class="flex gap-xs">
+<span class="flex items-center gap-xs font-label-sm text-label-sm text-on-surface-variant"><div class="w-2 h-2 rounded-full bg-primary"></div> On Time</span>
+<span class="flex items-center gap-xs font-label-sm text-label-sm text-on-surface-variant ml-sm"><div class="w-2 h-2 rounded-full bg-outline-variant"></div> Delayed</span>
+</div>
+</div>
+<div class="flex-1 w-full relative min-h-[300px]">
+<canvas id="performanceChart" width="918" height="490" style="display: block; box-sizing: border-box; height: 326.7px; width: 612px;"></canvas>
+</div>
+</div>
+<!-- Live Status Feed -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-md shadow-[0_1px_3px_rgba(0,0,0,0.05)] flex flex-col h-[400px]">
+<div class="flex justify-between items-center mb-md">
+<h2 class="font-headline-sm text-headline-sm font-semibold flex items-center gap-xs">
+<span class="w-2 h-2 rounded-full bg-error animate-pulse"></span>
+                        Live Status
+                    </h2>
+<button class="text-primary font-label-sm text-label-sm hover:underline">View All</button>
+</div>
+<div class="flex-1 overflow-y-auto pr-sm custom-scrollbar flex flex-col gap-md">
+<!-- Feed Item 1 -->
+<div class="relative pl-lg border-l border-outline-variant pb-md last:border-l-0 last:pb-0">
+<div class="absolute left-[-5px] top-1 w-2 h-2 rounded-full bg-primary ring-4 ring-surface-container-lowest"></div>
+<div class="font-label-sm text-label-sm text-on-surface-variant mb-xs">Just Now</div>
+<div class="font-body-md text-body-md font-semibold">Shipment #TRK-8921 Delivered</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Jakarta Hub to Bandung DC.</div>
+</div>
+<!-- Feed Item 2 -->
+<div class="relative pl-lg border-l border-outline-variant pb-md last:border-l-0 last:pb-0">
+<div class="absolute left-[-5px] top-1 w-2 h-2 rounded-full bg-error ring-4 ring-surface-container-lowest"></div>
+<div class="font-label-sm text-label-sm text-on-surface-variant mb-xs">15 mins ago</div>
+<div class="font-body-md text-body-md font-semibold text-error">Delay Alert: #TRK-4432</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Weather disruption on Route B. ETA revised +2hrs.</div>
+</div>
+<!-- Feed Item 3 -->
+<div class="relative pl-lg border-l border-outline-variant pb-md last:border-l-0 last:pb-0">
+<div class="absolute left-[-5px] top-1 w-2 h-2 rounded-full bg-outline ring-4 ring-surface-container-lowest"></div>
+<div class="font-label-sm text-label-sm text-on-surface-variant mb-xs">1 hr ago</div>
+<div class="font-body-md text-body-md font-semibold">Vehicle Maintenance Logged</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Fleet ID B 1234 CD requires scheduled oil change.</div>
+</div>
+<!-- Feed Item 4 -->
+<div class="relative pl-lg border-l border-outline-variant pb-md last:border-l-0 last:pb-0">
+<div class="absolute left-[-5px] top-1 w-2 h-2 rounded-full bg-primary ring-4 ring-surface-container-lowest"></div>
+<div class="font-label-sm text-label-sm text-on-surface-variant mb-xs">2 hrs ago</div>
+<div class="font-body-md text-body-md font-semibold">Shipment #TRK-9001 Dispatched</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Surabaya Hub to Malang DC.</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Critical Shipments Table -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.05)] overflow-hidden flex flex-col">
+<div class="p-md border-b border-outline-variant flex justify-between items-center bg-background">
+<h2 class="font-headline-sm text-headline-sm font-semibold">Recent Critical Shipments</h2>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">filter_list</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-background border-b border-outline-variant font-label-sm text-label-sm text-on-surface-variant uppercase">
+<th class="p-sm md:p-md font-medium">Tracking ID</th>
+<th class="p-sm md:p-md font-medium">Origin → Destination</th>
+<th class="p-sm md:p-md font-medium">Status</th>
+<th class="p-sm md:p-md font-medium">SLA Risk</th>
+<th class="p-sm md:p-md font-medium text-right">Action</th>
+</tr>
+</thead>
+<tbody class="font-body-sm text-body-sm">
+<tr class="border-b border-outline-variant hover:bg-surface-container-low transition-colors group cursor-pointer">
+<td class="p-sm md:p-md font-label-md text-label-md">#TRK-4432</td>
+<td class="p-sm md:p-md text-on-surface-variant">Jakarta Hub <span class="mx-xs material-symbols-outlined text-[14px] align-middle">arrow_forward</span> Bandung DC</td>
+<td class="p-sm md:p-md">
+<span class="inline-block px-xs py-[2px] bg-error-container text-on-error-container rounded font-label-sm text-label-sm font-bold">DELAYED</span>
+</td>
+<td class="p-sm md:p-md font-medium text-error">High</td>
+<td class="p-sm md:p-md text-right">
+<button class="text-primary font-medium hover:underline opacity-0 group-hover:opacity-100 transition-opacity">Intervene</button>
+</td>
+</tr>
+<tr class="border-b border-outline-variant hover:bg-surface-container-low transition-colors group cursor-pointer bg-slate-50">
+<td class="p-sm md:p-md font-label-md text-label-md">#TRK-8921</td>
+<td class="p-sm md:p-md text-on-surface-variant">Surabaya Hub <span class="mx-xs material-symbols-outlined text-[14px] align-middle">arrow_forward</span> Malang DC</td>
+<td class="p-sm md:p-md">
+<span class="inline-block px-xs py-[2px] bg-tertiary-fixed text-on-tertiary-fixed rounded font-label-sm text-label-sm font-bold">IN TRANSIT</span>
+</td>
+<td class="p-sm md:p-md font-medium text-on-surface-variant">Low</td>
+<td class="p-sm md:p-md text-right">
+<button class="text-primary font-medium hover:underline opacity-0 group-hover:opacity-100 transition-opacity">Details</button>
+</td>
+</tr>
+<tr class="border-b border-outline-variant hover:bg-surface-container-low transition-colors group cursor-pointer">
+<td class="p-sm md:p-md font-label-md text-label-md">#TRK-7710</td>
+<td class="p-sm md:p-md text-on-surface-variant">Medan Hub <span class="mx-xs material-symbols-outlined text-[14px] align-middle">arrow_forward</span> Binjai DC</td>
+<td class="p-sm md:p-md">
+<span class="inline-block px-xs py-[2px] bg-surface-variant text-on-surface rounded font-label-sm text-label-sm font-bold">PENDING DO</span>
+</td>
+<td class="p-sm md:p-md font-medium text-primary">Medium</td>
+<td class="p-sm md:p-md text-right">
+<button class="text-primary font-medium hover:underline opacity-0 group-hover:opacity-100 transition-opacity">Resolve</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-sm bg-background border-t border-outline-variant text-center">
+<button class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors">View Full List</button>
+</div>
+</div>
+</main>
+<style>
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2bfb0; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #a04100; }
+    </style>
+<script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            
+            // Dummy data for 30 days
+            const labels = Array.from({length: 30}, (_, i) => `Day ${i+1}`);
+            const onTimeData = Array.from({length: 30}, () => Math.floor(Math.random() * (98 - 85 + 1)) + 85);
+            const delayedData = onTimeData.map(val => 100 - val);
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'On Time %',
+                            data: onTimeData,
+                            borderColor: '#a04100', // primary color
+                            backgroundColor: 'rgba(160, 65, 0, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true,
+                            pointRadius: 0,
+                            pointHoverRadius: 6
+                        },
+                        {
+                            label: 'Delayed %',
+                            data: delayedData,
+                            borderColor: '#e2bfb0', // outline-variant
+                            borderWidth: 1,
+                            tension: 0.4,
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: {
+                            display: false // hidden custom legend used instead
+                        },
+                        tooltip: {
+                            backgroundColor: '#293045', // on-tertiary-container
+                            titleFont: { family: 'Inter', size: 12 },
+                            bodyFont: { family: 'Inter', size: 12 },
+                            padding: 12,
+                            cornerRadius: 4,
+                            displayColors: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: {
+                                color: '#eff4ff', // surface-container-low
+                                drawBorder: false,
+                            },
+                            ticks: {
+                                font: { family: 'JetBrains Mono', size: 10 },
+                                color: '#5a4136', // on-surface-variant
+                                callback: function(value) { return value + '%' }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false,
+                                drawBorder: false
+                            },
+                            ticks: {
+                                font: { family: 'Inter', size: 10 },
+                                color: '#5a4136',
+                                maxTicksLimit: 7
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+
+
+</body></html>

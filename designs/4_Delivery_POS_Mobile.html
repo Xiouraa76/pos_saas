@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>cAm LOGISTICS - Shipments</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary": "#5d5f5f",
+                    "background": "#f8f9ff",
+                    "primary-fixed": "#ffdbcc",
+                    "on-surface-variant": "#5a4136",
+                    "tertiary-fixed": "#dae2fd",
+                    "primary-fixed-dim": "#ffb693",
+                    "surface": "#f8f9ff",
+                    "secondary-fixed-dim": "#c6c6c7",
+                    "on-secondary-fixed": "#1a1c1c",
+                    "on-primary-container": "#572000",
+                    "inverse-surface": "#213145",
+                    "outline": "#8e7164",
+                    "surface-variant": "#d3e4fe",
+                    "surface-dim": "#cbdbf5",
+                    "primary-container": "#ff6b00",
+                    "inverse-primary": "#ffb693",
+                    "secondary-fixed": "#e2e2e2",
+                    "surface-container-highest": "#d3e4fe",
+                    "on-primary-fixed": "#351000",
+                    "tertiary-container": "#9198b1",
+                    "surface-container": "#e5eeff",
+                    "surface-container-high": "#dce9ff",
+                    "outline-variant": "#e2bfb0",
+                    "on-secondary-container": "#616363",
+                    "on-tertiary-container": "#293045",
+                    "on-primary": "#ffffff",
+                    "on-error": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "primary": "#a04100",
+                    "tertiary-fixed-dim": "#bec6e0",
+                    "on-surface": "#0b1c30",
+                    "on-error-container": "#93000a",
+                    "on-background": "#0b1c30",
+                    "surface-container-low": "#eff4ff",
+                    "on-tertiary-fixed-variant": "#3f465c",
+                    "surface-bright": "#f8f9ff",
+                    "on-secondary-fixed-variant": "#454747",
+                    "tertiary": "#565e74",
+                    "secondary-container": "#dfe0e0",
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "error": "#ba1a1a",
+                    "inverse-on-surface": "#eaf1ff",
+                    "on-tertiary-fixed": "#131b2e",
+                    "on-secondary": "#ffffff",
+                    "on-primary-fixed-variant": "#7a3000",
+                    "surface-tint": "#a04100"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "sm": "8px",
+                    "margin-desktop": "32px",
+                    "gutter": "16px",
+                    "base": "4px",
+                    "md": "16px",
+                    "margin-mobile": "16px",
+                    "xs": "4px",
+                    "lg": "24px",
+                    "xl": "32px"
+            },
+            "fontFamily": {
+                    "body-md": [
+                            "Inter"
+                    ],
+                    "headline-lg-mobile": [
+                            "Inter"
+                    ],
+                    "label-md": [
+                            "JetBrains Mono"
+                    ],
+                    "headline-sm": [
+                            "Inter"
+                    ],
+                    "body-sm": [
+                            "Inter"
+                    ],
+                    "headline-md": [
+                            "Inter"
+                    ],
+                    "headline-lg": [
+                            "Inter"
+                    ],
+                    "body-lg": [
+                            "Inter"
+                    ],
+                    "label-sm": [
+                            "JetBrains Mono"
+                    ]
+            },
+            "fontSize": {
+                    "body-md": [
+                            "14px",
+                            {
+                                    "lineHeight": "20px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-lg-mobile": [
+                            "24px",
+                            {
+                                    "lineHeight": "32px",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "label-md": [
+                            "13px",
+                            {
+                                    "lineHeight": "16px",
+                                    "fontWeight": "500"
+                            }
+                    ],
+                    "headline-sm": [
+                            "18px",
+                            {
+                                    "lineHeight": "24px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "body-sm": [
+                            "12px",
+                            {
+                                    "lineHeight": "16px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-md": [
+                            "24px",
+                            {
+                                    "lineHeight": "32px",
+                                    "letterSpacing": "-0.01em",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "headline-lg": [
+                            "32px",
+                            {
+                                    "lineHeight": "40px",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "body-lg": [
+                            "16px",
+                            {
+                                    "lineHeight": "24px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "label-sm": [
+                            "11px",
+                            {
+                                    "lineHeight": "14px",
+                                    "letterSpacing": "0.05em",
+                                    "fontWeight": "500"
+                            }
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+        }
+        body {
+            -webkit-tap-highlight-color: transparent;
+        }
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #dfe0e0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col md:flex-row pb-20 md:pb-0">
+<!-- Navigation Drawer (Desktop) -->
+<nav class="hidden md:flex flex-col bg-surface-container-low w-64 shadow-xl fixed inset-y-0 left-0 z-[60] p-4 transition-all duration-300 ease-in-out">
+<div class="flex items-center gap-3 mb-8 px-4">
+<img alt="cAm LOGISTICS Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCsfKtzEMJNbZcwByqe9nZz3nvYq45TGcofPPTzt75KxKB62jqNVogBt7czTxQ5YH_bVNxyUmUFpRlvVh81lc-lxZeSUlvQotGeUrobR2xfD6uwdziRhPzJeMsDYfqYHOLH1x50xKEcw-Dpgwo-BfM5fhTgG4pXxEdVWh1j8ySaEihmc5ariZI5-tdlbLo0voWBh_aA1hufrd6XlU4DaX5S_HEiDUB-YsJ9iavuqnn3ZhdQDoFWWE-5yViqMpfpSrEhWjU"/>
+</div>
+<div class="flex items-center gap-3 px-4 mb-6">
+<div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center text-primary-container overflow-hidden">
+<span class="material-symbols-outlined text-on-surface-variant" style="font-variation-settings: 'FILL' 1;">account_circle</span>
+</div>
+<div>
+<div class="text-body-md font-body-md font-semibold text-on-surface">Operations Manager</div>
+<div class="text-label-sm font-label-sm text-secondary">cAm Logistics HQ</div>
+</div>
+</div>
+<ul class="flex-1 space-y-2">
+<li>
+<a class="flex items-center gap-3 px-4 py-3 rounded-r-full text-on-surface-variant hover:bg-surface-container-high transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-body-md font-body-md">Analytics</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 rounded-r-full bg-primary-container text-on-primary-container font-bold transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">package_2</span>
+<span class="text-body-md font-body-md">Deliveries</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 rounded-r-full text-on-surface-variant hover:bg-surface-container-high transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined">database</span>
+<span class="text-body-md font-body-md">Data Portal</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 rounded-r-full text-on-surface-variant hover:bg-surface-container-high transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined">download</span>
+<span class="text-body-md font-body-md">Export Logs</span>
+</a>
+</li>
+</ul>
+<div class="mt-auto px-4 pt-4 border-t border-outline-variant">
+<a class="flex items-center gap-3 py-2 text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-body-md font-body-md">Account Settings</span>
+</a>
+<div class="text-label-sm font-label-sm text-secondary mt-2">v2.4.0</div>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 md:ml-64 flex flex-col min-h-screen relative">
+<!-- TopAppBar (Mobile & Desktop Header) -->
+<header class="bg-surface sticky top-0 z-40 w-full flex justify-between items-center px-margin-mobile md:px-margin-desktop h-16 transition-colors duration-200 border-b border-outline-variant shadow-sm md:shadow-none">
+<div class="flex items-center gap-3">
+<button class="md:hidden text-primary p-1 -ml-1 hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<img alt="cAm LOGISTICS Logo" class="h-6 w-auto object-contain md:hidden" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2BceSBBBMY4Iut6npkc-HbvJM9BgGGehbqCUE90YikV2jnGdeSAuFXfy3lIm71YWS81W9vmn9ldQ1jMDhYSRSkrbze3MbvlfGuUMNvxvziUWcQ59t5BeH2K8MZuxhHCVqLV4CVRf9Dh6mQeIbntG0Abn5SQ3NFZN6K8gC1dwnMqXlBZ67iIQNUIi937Pqxg-F-noYjYB9nYbCuG0ooAIHiuGqtaZzKkvvFIWSBfTSm-JZwYsIaDjD70oKvbPKgym77tg"/>
+<h1 class="hidden md:block text-headline-sm font-headline-sm font-bold text-primary tracking-tight">cAm LOGISTICS</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:bg-surface-container p-2 rounded-full transition-colors">
+<span class="material-symbols-outlined">search</span>
+</button>
+<button class="text-on-surface-variant hover:bg-surface-container p-2 rounded-full transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center text-primary overflow-hidden border border-outline-variant cursor-pointer md:hidden">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">person</span>
+</div>
+</div>
+</header>
+<!-- Content Canvas -->
+<div class="flex-1 p-margin-mobile md:p-margin-desktop space-y-6 max-w-7xl mx-auto w-full">
+<!-- Page Header & Actions -->
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+<div>
+<h2 class="text-headline-lg-mobile md:text-headline-lg font-headline-lg-mobile md:font-headline-lg text-on-surface">Shipments</h2>
+<p class="text-body-sm font-body-sm text-secondary mt-1">Manage and track active deliveries.</p>
+</div>
+<!-- Filters -->
+<div class="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0 hide-scrollbar">
+<button class="flex items-center gap-1 px-3 py-1.5 bg-primary-container text-on-primary-container rounded-full text-label-md font-label-md whitespace-nowrap transition-colors border border-transparent">
+                        All
+                    </button>
+<button class="flex items-center gap-1 px-3 py-1.5 bg-surface-container-low text-on-surface-variant border border-outline-variant hover:border-primary hover:text-primary rounded-full text-label-md font-label-md whitespace-nowrap transition-colors">
+                        In Transit
+                    </button>
+<button class="flex items-center gap-1 px-3 py-1.5 bg-surface-container-low text-on-surface-variant border border-outline-variant hover:border-primary hover:text-primary rounded-full text-label-md font-label-md whitespace-nowrap transition-colors">
+                        Delivered
+                    </button>
+<button class="flex items-center gap-1 px-3 py-1.5 bg-surface-container-low text-on-surface-variant border border-outline-variant hover:border-primary hover:text-primary rounded-full text-label-md font-label-md whitespace-nowrap transition-colors">
+<span class="material-symbols-outlined text-sm">filter_list</span>
+                        Filters
+                    </button>
+</div>
+</div>
+<!-- Shipments List (Bento-ish Grid for larger screens, List for mobile) -->
+<div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+<!-- Shipment Card 1 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 hover:shadow-md transition-shadow duration-200 relative group cursor-pointer flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-3">
+<div class="flex flex-col">
+<span class="text-label-md font-label-md text-secondary uppercase tracking-wider">STT-84920</span>
+<span class="text-headline-sm font-headline-sm text-on-surface font-semibold truncate max-w-[200px]" title="Acme Corp Industries">Acme Corp Industries</span>
+</div>
+<span class="inline-flex items-center px-2 py-1 rounded bg-green-100 text-green-800 text-label-sm font-label-sm font-bold uppercase tracking-wide">
+                                FTL
+                            </span>
+</div>
+<div class="flex items-center gap-2 text-body-sm font-body-sm text-on-surface-variant mb-4">
+<span class="material-symbols-outlined text-sm text-secondary">calendar_today</span>
+                            Oct 24, 2023 • 08:30 AM
+                        </div>
+<!-- Progress Bar (Transit Line) -->
+<div class="mb-4">
+<div class="flex justify-between text-label-sm font-label-sm text-secondary mb-1">
+<span>Origin</span>
+<span>Destination</span>
+</div>
+<div class="relative h-2 bg-surface-variant rounded-full overflow-hidden">
+<div class="absolute top-0 left-0 h-full bg-primary-container w-[75%] rounded-full"></div>
+</div>
+<div class="flex justify-between mt-1">
+<span class="text-body-sm font-body-sm text-on-surface font-medium truncate max-w-[45%]">Berlin, DE</span>
+<span class="text-body-sm font-body-sm text-on-surface font-medium truncate max-w-[45%] text-right">Paris, FR</span>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between border-t border-surface-variant pt-3 mt-2">
+<span class="text-label-md font-label-md text-primary-container flex items-center gap-1 font-semibold">
+<span class="w-2 h-2 rounded-full bg-primary-container animate-pulse"></span>
+                            In Transit
+                        </span>
+<button class="text-secondary hover:text-primary transition-colors p-1 opacity-0 group-hover:opacity-100 focus:opacity-100">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Shipment Card 2 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 hover:shadow-md transition-shadow duration-200 relative group cursor-pointer flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-3">
+<div class="flex flex-col">
+<span class="text-label-md font-label-md text-secondary uppercase tracking-wider">STT-84921</span>
+<span class="text-headline-sm font-headline-sm text-on-surface font-semibold truncate max-w-[200px]" title="Global Tech Supplies">Global Tech Supplies</span>
+</div>
+<span class="inline-flex items-center px-2 py-1 rounded bg-blue-100 text-blue-800 text-label-sm font-label-sm font-bold uppercase tracking-wide">
+                                LTL
+                            </span>
+</div>
+<div class="flex items-center gap-2 text-body-sm font-body-sm text-on-surface-variant mb-4">
+<span class="material-symbols-outlined text-sm text-secondary">calendar_today</span>
+                            Oct 23, 2023 • 14:15 PM
+                        </div>
+<!-- Progress Bar (Transit Line) -->
+<div class="mb-4">
+<div class="flex justify-between text-label-sm font-label-sm text-secondary mb-1">
+<span>Origin</span>
+<span>Destination</span>
+</div>
+<div class="relative h-2 bg-surface-variant rounded-full overflow-hidden">
+<div class="absolute top-0 left-0 h-full bg-gray-400 w-[100%] rounded-full"></div>
+</div>
+<div class="flex justify-between mt-1">
+<span class="text-body-sm font-body-sm text-on-surface font-medium truncate max-w-[45%]">Munich, DE</span>
+<span class="text-body-sm font-body-sm text-on-surface font-medium truncate max-w-[45%] text-right">London, UK</span>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between border-t border-surface-variant pt-3 mt-2">
+<span class="text-label-md font-label-md text-secondary flex items-center gap-1 font-semibold">
+<span class="material-symbols-outlined text-sm">check_circle</span>
+                            Delivered
+                        </span>
+<button class="text-secondary hover:text-primary transition-colors p-1 opacity-0 group-hover:opacity-100 focus:opacity-100">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Shipment Card 3 -->
+<div class="bg-surface-container-lowest border border-primary-container border-opacity-50 rounded-xl p-4 hover:shadow-md transition-shadow duration-200 relative group cursor-pointer flex flex-col justify-between shadow-sm">
+<div class="absolute top-0 right-0 w-12 h-12 overflow-hidden rounded-tr-xl">
+<div class="absolute top-0 right-0 bg-primary-container text-on-primary-container text-[10px] font-bold py-1 px-3 transform rotate-45 translate-x-3 -translate-y-1 w-16 text-center">NEW</div>
+</div>
+<div>
+<div class="flex justify-between items-start mb-3">
+<div class="flex flex-col">
+<span class="text-label-md font-label-md text-secondary uppercase tracking-wider">STT-84922</span>
+<span class="text-headline-sm font-headline-sm text-on-surface font-semibold truncate max-w-[180px]" title="Nexus Retailers">Nexus Retailers</span>
+</div>
+<span class="inline-flex items-center px-2 py-1 rounded bg-purple-100 text-purple-800 text-label-sm font-label-sm font-bold uppercase tracking-wide mr-4">
+                                LCL
+                            </span>
+</div>
+<div class="flex items-center gap-2 text-body-sm font-body-sm text-on-surface-variant mb-4">
+<span class="material-symbols-outlined text-sm text-secondary">calendar_today</span>
+                            Oct 25, 2023 • 09:00 AM
+                        </div>
+<!-- Progress Bar (Transit Line) -->
+<div class="mb-4">
+<div class="flex justify-between text-label-sm font-label-sm text-secondary mb-1">
+<span>Origin</span>
+<span>Destination</span>
+</div>
+<div class="relative h-2 bg-surface-variant rounded-full overflow-hidden">
+<div class="absolute top-0 left-0 h-full bg-primary-container w-[10%] rounded-full"></div>
+</div>
+<div class="flex justify-between mt-1">
+<span class="text-body-sm font-body-sm text-on-surface font-medium truncate max-w-[45%]">Hamburg, DE</span>
+<span class="text-body-sm font-body-sm text-on-surface font-medium truncate max-w-[45%] text-right">Madrid, ES</span>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between border-t border-surface-variant pt-3 mt-2">
+<span class="text-label-md font-label-md text-primary-container flex items-center gap-1 font-semibold">
+<span class="material-symbols-outlined text-sm">local_shipping</span>
+                            Dispatching
+                        </span>
+<button class="text-secondary hover:text-primary transition-colors p-1 opacity-0 group-hover:opacity-100 focus:opacity-100">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Shipment Card 4 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 hover:shadow-md transition-shadow duration-200 relative group cursor-pointer flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-3">
+<div class="flex flex-col">
+<span class="text-label-md font-label-md text-secondary uppercase tracking-wider">STT-84919</span>
+<span class="text-headline-sm font-headline-sm text-on-surface font-semibold truncate max-w-[200px]" title="Vertex Logistics">Vertex Logistics</span>
+</div>
+<span class="inline-flex items-center px-2 py-1 rounded bg-green-100 text-green-800 text-label-sm font-label-sm font-bold uppercase tracking-wide">
+                                FTL
+                            </span>
+</div>
+<div class="flex items-center gap-2 text-body-sm font-body-sm text-on-surface-variant mb-4">
+<span class="material-symbols-outlined text-sm text-secondary">calendar_today</span>
+                            Oct 22, 2023 • 11:30 AM
+                        </div>
+<!-- Progress Bar (Transit Line) -->
+<div class="mb-4">
+<div class="flex justify-between text-label-sm font-label-sm text-secondary mb-1">
+<span>Origin</span>
+<span>Destination</span>
+</div>
+<div class="relative h-2 bg-surface-variant rounded-full overflow-hidden">
+<div class="absolute top-0 left-0 h-full bg-error w-[40%] rounded-full"></div>
+</div>
+<div class="flex justify-between mt-1">
+<span class="text-body-sm font-body-sm text-on-surface font-medium truncate max-w-[45%]">Frankfurt, DE</span>
+<span class="text-body-sm font-body-sm text-on-surface font-medium truncate max-w-[45%] text-right">Rome, IT</span>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between border-t border-surface-variant pt-3 mt-2">
+<span class="text-label-md font-label-md text-error flex items-center gap-1 font-semibold">
+<span class="material-symbols-outlined text-sm">warning</span>
+                            Delayed
+                        </span>
+<button class="text-secondary hover:text-primary transition-colors p-1 opacity-0 group-hover:opacity-100 focus:opacity-100">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Load More Button -->
+<div class="flex justify-center mt-6">
+<button class="px-6 py-2 border border-outline-variant text-on-surface-variant rounded-full hover:bg-surface-container hover:text-primary transition-colors text-label-md font-label-md">
+                     Load More
+                 </button>
+</div>
+<!-- Bottom padding for FAB -->
+<div class="h-20"></div>
+</div>
+</main>
+<!-- Floating Action Button (FAB) -->
+<button aria-label="Add New Shipment" class="fixed bottom-24 md:bottom-8 right-4 md:right-8 w-14 h-14 bg-primary-container text-on-primary-container rounded-2xl shadow-lg hover:shadow-xl hover:bg-primary hover:text-white transition-all duration-200 flex items-center justify-center z-50 group transform active:scale-95">
+<span class="material-symbols-outlined text-3xl group-hover:rotate-90 transition-transform duration-300">add</span>
+</button>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden bg-surface fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 py-3 border-t border-outline-variant rounded-t-xl shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+<a class="flex flex-col items-center justify-center text-secondary transition-transform duration-150 active:scale-90 px-4 py-1" href="#">
+<span class="material-symbols-outlined text-2xl mb-1">dashboard</span>
+<span class="text-label-sm font-label-sm">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 transition-transform duration-150 active:scale-90" href="#">
+<span class="material-symbols-outlined text-2xl mb-1" style="font-variation-settings: 'FILL' 1;">local_shipping</span>
+<span class="text-label-sm font-label-sm font-bold">Shipments</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary transition-transform duration-150 active:scale-90 px-4 py-1" href="#">
+<span class="material-symbols-outlined text-2xl mb-1">sync</span>
+<span class="text-label-sm font-label-sm">Sync</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary transition-transform duration-150 active:scale-90 px-4 py-1 hidden sm:flex" href="#">
+<span class="material-symbols-outlined text-2xl mb-1">assessment</span>
+<span class="text-label-sm font-label-sm">Reports</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary transition-transform duration-150 active:scale-90 px-4 py-1" href="#">
+<span class="material-symbols-outlined text-2xl mb-1">group</span>
+<span class="text-label-sm font-label-sm">Users</span>
+</a>
+</nav>
+</body></html>
