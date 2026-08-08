@@ -393,42 +393,34 @@ function DashboardContent() {
     // Filter in JS to match RPC get_dashboard_stats_v2 logic
     if (type === "SLA") {
       filtered = filtered.filter((row: GenericData) => {
-        if (!row.tgl_diterima) return false;
-        const tglMasuk = new Date(row.tgl_masuk);
-        const tglDiterima = new Date(row.tgl_diterima);
-        const diffDays = Math.floor((tglDiterima.getTime() - tglMasuk.getTime()) / (1000 * 60 * 60 * 24));
-        const rule = row.rule_sla_hari != null ? row.rule_sla_hari : 3;
-        if (statusIndex === 0) return diffDays < rule;
-        if (statusIndex === 1) return diffDays === rule;
-        if (statusIndex === 2) return diffDays > rule;
+        const val = (row.rate_sla || "").toLowerCase();
+        if (statusIndex === 0) return val.includes("sesuai");
+        if (statusIndex === 1) return val.includes("konfirm");
+        if (statusIndex === 2) return val.includes("gagal");
         return false;
       });
     } else if (type === "KUD") {
       filtered = filtered.filter((row: GenericData) => {
         const val = (row.rate_kud || "").toLowerCase();
-        if (statusIndex === 0) return /(tepat|ok|ya|sudah|sesuai|v)/.test(val);
-        if (statusIndex === 1) return /(lewat|late|terlambat|belum)/.test(val);
-        if (statusIndex === 2) return !/(tepat|ok|ya|sudah|sesuai|v)/.test(val) && !/(lewat|late|terlambat|belum)/.test(val);
+        if (statusIndex === 0) return /(tepat|sesuai|ok)/.test(val);
+        if (statusIndex === 1) return /(lewat|lambat|belum)/.test(val);
+        if (statusIndex === 2) return !/(tepat|sesuai|ok)/.test(val) && !/(lewat|lambat|belum)/.test(val);
         return false;
       });
     } else if (type === "KOMPLAIN") {
       filtered = filtered.filter((row: GenericData) => {
         const val = (row.rate_komplain || "").toLowerCase();
-        if (statusIndex === 0) return /(aman|tidak ada|no|baik|ok)/.test(val);
-        if (statusIndex === 1) return /(teratasi|solve|diselesaikan)/.test(val);
-        if (statusIndex === 2) return /(berat|escala|parah|serius)/.test(val);
+        if (statusIndex === 0) return /(aman|tidak)/.test(val);
+        if (statusIndex === 1) return val.includes("teratasi");
+        if (statusIndex === 2) return val.includes("berat");
         return false;
       });
     } else if (type === "DOC") {
       filtered = filtered.filter((row: GenericData) => {
-        if (!row.tgl_diterima) return false;
-        const tglMasuk = new Date(row.tgl_masuk);
-        const tglDiterima = new Date(row.tgl_diterima);
-        const diffDays = Math.floor((tglDiterima.getTime() - tglMasuk.getTime()) / (1000 * 60 * 60 * 24));
-        const rule = row.rule_sla_hari != null ? row.rule_sla_hari : 3;
-        if (statusIndex === 0) return diffDays <= rule;
-        if (statusIndex === 1) return diffDays > rule && diffDays <= rule + 2;
-        if (statusIndex === 2) return diffDays > rule + 2;
+        const val = (row.kecepatan_doc || "").toLowerCase();
+        if (statusIndex === 0) return val.includes("cepat");
+        if (statusIndex === 1) return val.includes("lambat");
+        if (statusIndex === 2) return val.includes("gagal");
         return false;
       });
     }
