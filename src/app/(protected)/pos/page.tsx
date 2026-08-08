@@ -122,6 +122,9 @@ export default function PosPage() {
 
   const [isLoading, setIsLoading] = useState(false);
 
+  // Status Barang Filter (Tugas 4)
+  const [statusBarangFilter, setStatusBarangFilter] = useState("all");
+
   const isFTL = selectedService === "FTL";
 
 
@@ -678,6 +681,18 @@ export default function PosPage() {
               <CardContent>
                 <div className="grid grid-cols-3 gap-4">
                     <div className="space-y-2">
+                      <Label htmlFor="koli" className="font-sans font-medium text-xs text-slate-500 uppercase tracking-wider">Koli (Qty)</Label>
+                      <Input 
+                        id="koli" 
+                        type="number" 
+                        placeholder="0" 
+                        value={qtyKoli}
+                        onChange={(e) => setQtyKoli(e.target.value)}
+                        className="font-mono" 
+                        disabled={isLoading}
+                      />
+                    </div>
+                    <div className="space-y-2">
                       <Label htmlFor="beratKg" className="font-sans font-medium text-xs text-slate-500 uppercase tracking-wider">Berat (Kg)</Label>
                       <Input 
                         id="beratKg" 
@@ -699,18 +714,6 @@ export default function PosPage() {
                         placeholder="0.00" 
                         value={volume}
                         onChange={(e) => setVolume(e.target.value)}
-                        className="font-mono" 
-                        disabled={isLoading}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="koli" className="font-sans font-medium text-xs text-slate-500 uppercase tracking-wider">Koli (Qty)</Label>
-                      <Input 
-                        id="koli" 
-                        type="number" 
-                        placeholder="0" 
-                        value={qtyKoli}
-                        onChange={(e) => setQtyKoli(e.target.value)}
                         className="font-mono" 
                         disabled={isLoading}
                       />
@@ -966,6 +969,114 @@ export default function PosPage() {
               </Button>
             </div>
           </form>
+
+      {/* ═══════════════ LOG DATA TERAKHIR ═══════════════ */}
+      <Card className="shadow-sm border-slate-200 mt-6">
+        <CardContent className="p-5">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+            <h3 className="text-lg font-bold text-slate-800 font-sans">Log Data Terakhir</h3>
+            <div className="flex gap-2 items-center">
+              {/* Status Barang Filter (Tugas 4) */}
+              <select
+                value={statusBarangFilter}
+                onChange={(e) => setStatusBarangFilter(e.target.value)}
+                className="h-9 rounded-md border border-input bg-background px-3 text-sm font-sans focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <option value="all">Semua Status</option>
+                <option value="warehouse">Di Warehouse (JKT/SMG)</option>
+                <option value="berangkat">Sudah Berangkat</option>
+              </select>
+              <div className="flex gap-1">
+                <Input 
+                  placeholder="Cari STT / Customer..." 
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="max-w-[200px] bg-white h-9"
+                />
+                <Button 
+                  type="button"
+                  variant="outline" 
+                  onClick={() => fetchShipments(searchTerm)}
+                  className="h-9"
+                >
+                  <Search className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          <div className="overflow-x-auto rounded-lg border border-slate-100">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-slate-50">
+                  <TableHead className="text-xs">Tgl Masuk</TableHead>
+                  <TableHead className="text-xs">No. STT</TableHead>
+                  <TableHead className="text-xs">Layanan</TableHead>
+                  <TableHead className="text-xs">Customer</TableHead>
+                  <TableHead className="text-xs">Status</TableHead>
+                  <TableHead className="text-xs text-right">Action</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {data
+                  .filter(item => {
+                    if (statusBarangFilter === "warehouse") {
+                      const s = (item.status_pengiriman || "").toLowerCase();
+                      return s.includes("di lokasi muat") || s.includes("selesai muat") || s.includes("bongkar") || s === "in" || s.includes("masuk");
+                    }
+                    if (statusBarangFilter === "berangkat") {
+                      const s = (item.status_pengiriman || "").toLowerCase();
+                      return s.includes("di perjalanan") || s.includes("selesai bongkar") || s === "out" || s.includes("keluar") || s.includes("dokumen kembali");
+                    }
+                    return true;
+                  })
+                  .map(item => (
+                  <TableRow key={item.id} className="hover:bg-orange-50/30">
+                    <TableCell className="text-xs text-slate-600">{item.tgl_masuk ? new Date(item.tgl_masuk).toLocaleDateString('id-ID') : '-'}</TableCell>
+                    <TableCell className="font-mono text-xs font-semibold text-orange-700">{item.no_stt || '-'}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="text-[10px] font-semibold">{item.jenis_layanan}</Badge>
+                    </TableCell>
+                    <TableCell className="text-xs text-slate-700 font-medium">{item.nama_customer_teks || item.cabang_customer || '-'}</TableCell>
+                    <TableCell>
+                      <span className="text-[10px] px-2 py-1 bg-slate-100 text-slate-600 rounded-md font-medium">{item.status_pengiriman || '-'}</span>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-1">
+                        <Button 
+                          type="button" 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => handleEdit(item)}
+                          className="h-7 px-2 text-xs text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+                        >
+                          Edit
+                        </Button>
+                        <Button 
+                          type="button" 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => handleDelete(item.id!, item.no_stt)}
+                          className="h-7 px-2 text-xs text-red-500 hover:text-red-700 hover:bg-red-50"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {data.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-8 text-slate-400">
+                      Belum ada data. Masukkan data pengiriman baru atau cari STT di atas.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

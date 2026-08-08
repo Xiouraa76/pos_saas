@@ -15,6 +15,15 @@ interface GenericData {
   [key: string]: any;
 }
 
+// Map timeline status codes to valid shipment enum values
+const TIMELINE_TO_ENUM: Record<string, string> = {
+  "IN": "Di Lokasi Muat",
+  "OUT": "Di Perjalanan",
+  "Di Perjalanan": "Di Perjalanan",
+  "Bongkar": "Bongkar",
+  "Selesai Bongkar": "Selesai Bongkar",
+  "Bermasalah": "Bermasalah",
+};
 
 export function FormInputLtlLcl() {
   const supabase = createClient();
@@ -23,6 +32,7 @@ export function FormInputLtlLcl() {
   const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
   const [isLoading, setIsLoading] = useState(false);
   const [sessionUser, setSessionUser] = useState<any>(null);
+  const [statusBarangFilter, setStatusBarangFilter] = useState("all");
 
   // Pagination State
   const [page, setPage] = useState(0);
@@ -142,12 +152,20 @@ export function FormInputLtlLcl() {
         
       const updatedCheckpoints = [...currentCheckpoints, newCheckpoint];
 
+      // Map timeline status to valid database enum
+      const mappedStatus = TIMELINE_TO_ENUM[timelineStatus];
+      const updatePayload: Record<string, any> = {
+        timeline_checkpoints: updatedCheckpoints,
+      };
+      if (mappedStatus) {
+        updatePayload.status_pengiriman = mappedStatus;
+      }
+      // Always store the raw timeline status in status_detail_text for reference
+      updatePayload.status_detail_text = `${timelineStatus} - ${timelineLocation}`;
+
       const { error: updateError } = await supabase
         .from('shipments')
-        .update({ 
-            timeline_checkpoints: updatedCheckpoints,
-            status_pengiriman: timelineStatus // update status utama
-        })
+        .update(updatePayload)
         .eq('id', existingShipment.id);
 
       if (updateError) throw updateError;
@@ -163,8 +181,16 @@ export function FormInputLtlLcl() {
       setPage(0);
       await fetchLtlShipments(debouncedSearchTerm, 0, false);
     } catch (err: unknown) {
-      console.error(err);
-      alert("Gagal menyimpan timeline: " + (err instanceof Error ? err.message : String(err)));
+      console.error("Timeline save error:", err);
+      let errorMsg = "Kesalahan tidak diketahui";
+      if (err instanceof Error) {
+        errorMsg = err.message;
+      } else if (typeof err === "object" && err !== null) {
+        errorMsg = (err as any).message || (err as any).details || (err as any).error_description || JSON.stringify(err);
+      } else {
+        errorMsg = String(err);
+      }
+      alert("Gagal menyimpan timeline: " + errorMsg);
     } finally {
       setIsLoading(false);
     }
@@ -245,12 +271,23 @@ export function FormInputLtlLcl() {
         <CardHeader className="pb-4 border-b bg-slate-50">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <CardTitle className="font-sans text-lg">Log Eksekusi Terakhir (LTL/LCL)</CardTitle>
-            <Input 
-              placeholder="Cari STT..." 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="max-w-xs bg-white"
-            />
+            <div className="flex gap-2 items-center">
+              <select
+                value={statusBarangFilter}
+                onChange={(e) => setStatusBarangFilter(e.target.value)}
+                className="h-9 rounded-md border border-input bg-background px-3 text-sm font-sans focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <option value="all">Semua Status</option>
+                <option value="warehouse">Di Warehouse</option>
+                <option value="berangkat">Sudah Berangkat</option>
+              </select>
+              <Input 
+                placeholder="Cari STT..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="max-w-xs bg-white"
+              />
+            </div>
           </div>
         </CardHeader>
         <CardContent className="p-0 overflow-x-auto">
@@ -265,7 +302,19 @@ export function FormInputLtlLcl() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data.map(item => {
+              {data
+                .filter(item => {
+                  if (statusBarangFilter === "warehouse") {
+                    const s = (item.status_pengiriman || "").toLowerCase();
+                    return s.includes("di lokasi muat") || s.includes("selesai muat") || s.includes("bongkar") || s === "in" || s.includes("masuk");
+                  }
+                  if (statusBarangFilter === "berangkat") {
+                    const s = (item.status_pengiriman || "").toLowerCase();
+                    return s.includes("di perjalanan") || s.includes("selesai bongkar") || s === "out" || s.includes("keluar") || s.includes("dokumen kembali");
+                  }
+                  return true;
+                })
+                .map(item => {
                   const timelines = Array.isArray(item.timeline_checkpoints) ? item.timeline_checkpoints : [];
                   const lastTimeline = timelines.length > 0 ? timelines[timelines.length - 1] : null;
                   return (

@@ -134,9 +134,15 @@ function LiveTrackingSlaCard({ data = [] }: { data: GenericData[] }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm] = useDebounce(searchTerm, 300);
 
-  const filteredData = data.filter((item) =>
-    String(item.sla_timeline_narrative || "").toLowerCase().includes(debouncedSearchTerm.toLowerCase())
-  );
+  const filteredData = data.filter((item) => {
+    if (!debouncedSearchTerm) return true;
+    const q = debouncedSearchTerm.toLowerCase();
+    return (
+      String(item.no_stt || "").toLowerCase().includes(q) ||
+      String(item.nama_customer_teks || "").toLowerCase().includes(q) ||
+      String(item.status_pengiriman || "").toLowerCase().includes(q)
+    );
+  });
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-5">
@@ -166,17 +172,23 @@ function LiveTrackingSlaCard({ data = [] }: { data: GenericData[] }) {
         />
       </div>
 
-      {/* List Feed */}
-      <div className="max-h-[320px] overflow-y-auto space-y-4 pr-2 custom-scrollbar">
+      {/* List Feed - Compact Two-Line Format */}
+      <div className="max-h-[320px] overflow-y-auto space-y-2 pr-2 custom-scrollbar">
         {filteredData.length > 0 ? (
           filteredData.map((item, index) => (
-            <div key={index} className="flex gap-3 items-start">
-              {/* Orange Dot */}
-              <div className="w-1.5 h-1.5 rounded-full bg-orange-500 mt-1.5 flex-shrink-0"></div>
-              {/* Narrative Text */}
-              <p className="text-xs text-slate-600 leading-relaxed">
-                {item.sla_timeline_narrative}
-              </p>
+            <div key={index} className="flex gap-3 items-start p-2 rounded-lg hover:bg-slate-50 transition-colors">
+              <div className="w-1.5 h-1.5 rounded-full bg-orange-500 mt-2 flex-shrink-0"></div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold font-mono text-orange-700 truncate">{item.no_stt || '-'}</span>
+                  <span className="text-[10px] text-slate-400">·</span>
+                  <span className="text-xs font-semibold text-slate-700 truncate">{item.nama_customer_teks || '-'}</span>
+                </div>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <span className="text-[10px] px-1.5 py-0.5 bg-slate-100 text-slate-500 rounded font-medium">{item.status_pengiriman || '-'}</span>
+                  <span className="text-[10px] text-slate-400">{item.tgl_masuk ? new Date(item.tgl_masuk).toLocaleDateString('id-ID') : ''}</span>
+                </div>
+              </div>
             </div>
           ))
         ) : (
@@ -313,20 +325,17 @@ function DashboardContent() {
     }
     setIsRefreshing(false);
 
-    // Fetch Live Track SLA for all services
+    // Fetch Live Track SLA - fetch all STT without date filter for universal search
     let slaQuery = supabase
       .from("shipments")
-      .select("sla_timeline_narrative, tgl_masuk")
-      .not("sla_timeline_narrative", "is", null)
+      .select("no_stt, nama_customer_teks, status_pengiriman, tgl_masuk")
       .order("tgl_masuk", { ascending: false })
-      .limit(50); // Increased limit since we have search now
+      .limit(100);
     
     if (activeService !== "all") {
       slaQuery = slaQuery.eq("jenis_layanan", activeService);
     }
-    if (dateFrom && dateTo) {
-      slaQuery = slaQuery.gte("tgl_masuk", dateFrom).lte("tgl_masuk", dateTo);
-    }
+    // No date filter here - so all STTs are searchable
     const { data: slaData } = await slaQuery;
     setLiveTrackSla(slaData || []);
   }, [activeService, dateRange, customDate, supabase]);
