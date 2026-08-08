@@ -70,6 +70,7 @@ const DATE_RANGES = [
   { label: "30 Hari Terakhir", days: 30 },
   { label: "Bulan Ini", days: -1 },
   { label: "Semua Data", days: 0 },
+  { label: "Custom Date", days: -2 },
 ];
 
 // ─── Helpers ────────────────────────────────────────────────────────
@@ -265,6 +266,7 @@ function DashboardContent() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [dateRange, setDateRange] = useState(30);
+  const [customDate, setCustomDate] = useState({ from: "", to: "" });
   const [showDateDropdown, setShowDateDropdown] = useState(false);
   const [rpcError, setRpcError] = useState(false);
 
@@ -292,6 +294,9 @@ function DashboardContent() {
       const now = new Date();
       dateFrom = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`;
       dateTo = now.toISOString().split("T")[0];
+    } else if (dateRange === -2) {
+      dateFrom = customDate.from || null;
+      dateTo = customDate.to || null;
     }
 
     const { data: rpcData, error } = await supabase.rpc("get_dashboard_stats_v2", {
@@ -324,7 +329,7 @@ function DashboardContent() {
     }
     const { data: slaData } = await slaQuery;
     setLiveTrackSla(slaData || []);
-  }, [activeService, dateRange, supabase]);
+  }, [activeService, dateRange, customDate, supabase]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -377,6 +382,9 @@ function DashboardContent() {
     } else if (dateRange === -1) {
       const now = new Date();
       query = query.gte("tgl_masuk", `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`).lte("tgl_masuk", now.toISOString().split("T")[0]);
+    } else if (dateRange === -2) {
+      if (customDate.from) query = query.gte("tgl_masuk", customDate.from);
+      if (customDate.to) query = query.lte("tgl_masuk", customDate.to);
     }
 
     const { data } = await query;
@@ -444,6 +452,11 @@ function DashboardContent() {
   const countLtl = d?.count_ltl ?? 0;
   const countLcl = d?.count_lcl ?? 0;
   const countFtl = d?.count_ftl ?? 0;
+
+  // Koli per service
+  const koliLtl = d?.koli_ltl ?? 0;
+  const koliLcl = d?.koli_lcl ?? 0;
+  const koliFtl = d?.koli_ftl ?? 0;
 
   // SLA
   const slaTotal = d?.sla_total ?? 0;
@@ -516,21 +529,54 @@ function DashboardContent() {
                 <ChevronDown className="w-3 h-3" />
               </button>
               {showDateDropdown && (
-                <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-xl border border-slate-200 py-1 z-50">
+                <div className="absolute right-0 top-full mt-1 w-64 bg-white rounded-lg shadow-xl border border-slate-200 py-1 z-50 overflow-hidden">
                   {DATE_RANGES.map((r) => (
                     <button
                       key={r.days}
                       onClick={() => {
                         setDateRange(r.days);
-                        setShowDateDropdown(false);
+                        if (r.days !== -2) {
+                          setShowDateDropdown(false);
+                        }
                       }}
-                      className={`w-full text-left px-4 py-2.5 text-sm hover:bg-slate-50 transition-colors ${
-                        dateRange === r.days ? "text-orange-600 font-semibold bg-orange-50" : "text-slate-700"
+                      className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
+                        dateRange === r.days ? "text-orange-600 font-semibold bg-orange-50" : "text-slate-700 hover:bg-slate-50"
                       }`}
                     >
                       {r.label}
                     </button>
                   ))}
+                  {dateRange === -2 && (
+                    <div className="p-4 border-t border-slate-100 bg-slate-50 space-y-3">
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-500 mb-1">Start Date</label>
+                        <input 
+                          type="date" 
+                          value={customDate.from}
+                          onChange={(e) => setCustomDate(prev => ({ ...prev, from: e.target.value }))}
+                          className="w-full px-3 py-1.5 border border-slate-200 rounded-md text-sm focus:ring-1 focus:ring-orange-500 outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-500 mb-1">End Date</label>
+                        <input 
+                          type="date" 
+                          value={customDate.to}
+                          onChange={(e) => setCustomDate(prev => ({ ...prev, to: e.target.value }))}
+                          className="w-full px-3 py-1.5 border border-slate-200 rounded-md text-sm focus:ring-1 focus:ring-orange-500 outline-none"
+                        />
+                      </div>
+                      <button 
+                        onClick={() => {
+                          fetchStats();
+                          setShowDateDropdown(false);
+                        }}
+                        className="w-full bg-orange-600 text-white rounded-md py-1.5 text-sm font-semibold hover:bg-orange-700 transition-colors"
+                      >
+                        Terapkan
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -630,9 +676,9 @@ function DashboardContent() {
                       Total QTY (Koli)
                     </div>
                     <div className="mt-3 pt-3 border-t border-slate-100 flex gap-3 text-xs text-slate-500">
-                      <span>LTL: <b className="text-slate-700">{formatNumber(countLtl)}</b></span>
-                      <span>LCL: <b className="text-slate-700">{formatNumber(countLcl)}</b></span>
-                      <span>FTL: <b className="text-slate-700">{formatNumber(countFtl)}</b></span>
+                      <span>LTL: <b className="text-slate-700">{formatNumber(koliLtl)}</b></span>
+                      <span>LCL: <b className="text-slate-700">{formatNumber(koliLcl)}</b></span>
+                      <span>FTL: <b className="text-slate-700">{formatNumber(koliFtl)}</b></span>
                     </div>
                   </CardContent>
                 </Card>
@@ -692,9 +738,9 @@ function DashboardContent() {
 
               {/* ─── DISTRIBUSI TRANSAKSI (Bar Chart) ─── */}
               <DistributionChart
-                ltl={countLtl}
-                lcl={countLcl}
-                ftl={countFtl}
+                ltl={koliLtl}
+                lcl={koliLcl}
+                ftl={koliFtl}
               />
 
               {/* ─── INDIKATOR KINERJA UTAMA (KPI) ─── */}
