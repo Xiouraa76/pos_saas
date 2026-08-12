@@ -48,14 +48,16 @@ function sanitizeOrNull(val: string, maxLen: number = MAX_LEN.short): string | n
 }
 
 const STT_STATUS = [
-  { name: "Di Lokasi Muat", icon: MapPin },
-  { name: "Selesai Muat", icon: PackageCheck },
-  { name: "Di Perjalanan", icon: Truck },
-  { name: "Bongkar", icon: PackageOpen },
-  { name: "Selesai Bongkar", icon: CheckCircle2 },
-  { name: "Dokumen Kembali", icon: FileCheck },
-  { name: "Bermasalah", icon: AlertTriangle },
-  { name: "Custom", icon: Settings2 }
+  { name: "Di Lokasi Muat", icon: MapPin, color: "bg-orange-500 text-white border-orange-600 ring-orange-200" },
+  { name: "Di Perjalanan", icon: Truck, color: "bg-green-500 text-white border-green-600 ring-green-200" },
+  { name: "Sudah Dipaketkan", icon: PackageCheck, color: "bg-red-600 text-white border-red-700 ring-red-200" },
+  { name: "Di Finance", icon: CheckCircle2, color: "bg-white text-slate-800 border-slate-300 ring-slate-200" },
+  { name: "Bongkar", icon: PackageOpen, color: "bg-yellow-400 text-slate-800 border-yellow-500 ring-yellow-200" },
+  { name: "Belum Kembali / Belum Dipaketkan", icon: AlertTriangle, color: "bg-green-800 text-white border-green-900 ring-green-300" },
+  { name: "Doc Di CAM BEKASI", icon: FileCheck, color: "bg-purple-500 text-white border-purple-600 ring-purple-200" },
+  { name: "Doc Bermasalah", icon: AlertTriangle, color: "bg-pink-500 text-white border-pink-600 ring-pink-200" },
+  { name: "Doc Di CAM SMG", icon: FileCheck, color: "bg-blue-400 text-white border-blue-500 ring-blue-200" },
+  { name: "Custom", icon: Settings2, color: "bg-slate-700 text-white border-slate-800 ring-slate-300" }
 ];
 
 // Whitelist untuk validasi enum sisi frontend (CELAH-04 fix)
@@ -474,14 +476,13 @@ export default function PosPage() {
                     className="flex flex-col items-center relative z-10 min-w-[120px] px-2 shrink-0 cursor-pointer group"
                   >
                     <div className={`w-12 h-12 rounded-full flex items-center justify-center border-2 mb-3 transition-all duration-300 bg-white
-                      ${isSelected ? "border-orange-600 text-orange-600 ring-4 ring-orange-100 shadow-lg scale-110" 
-                      : isActive ? "border-orange-600 bg-orange-600 text-white" 
-                      : isIssue ? "border-slate-200 text-red-300 group-hover:border-red-300"
-                      : "border-slate-200 text-slate-300 group-hover:border-orange-300 group-hover:text-orange-400"}`}>
+                      ${isSelected ? `${status.color} ring-4 shadow-lg scale-110` 
+                      : isActive ? status.color 
+                      : "border-slate-200 text-slate-300 group-hover:border-slate-300 group-hover:text-slate-400"}`}>
                       <Icon className="w-5 h-5" />
                     </div>
-                    <span className={`text-xs font-semibold text-center leading-tight transition-colors
-                      ${isSelected ? 'text-orange-700' : isActive ? 'text-slate-800' : isIssue ? 'text-red-400/70' : 'text-slate-400 group-hover:text-orange-500'}`}>
+                    <span className={`text-[10px] font-semibold text-center leading-tight transition-colors max-w-[100px] break-words
+                      ${isSelected ? 'text-slate-900 font-bold' : isActive ? 'text-slate-700' : 'text-slate-400 group-hover:text-slate-500'}`}>
                       {status.name}
                     </span>
                   </div>
