@@ -92,9 +92,9 @@ function KpiCard({
 }: {
   title: string;
   percent: number;
-  labels: [string, string, string];
-  values: [number, number, number];
-  colors: [string, string, string];
+  labels: string[];
+  values: number[];
+  colors: string[];
   onLabelClick?: (index: number) => void;
 }) {
   return (
@@ -110,17 +110,17 @@ function KpiCard({
         />
       </div>
       <div className="flex items-center justify-between text-xs">
-        {[0, 1, 2].map((idx) => (
+        {labels.map((label, idx) => (
           <span key={idx} className={colors[idx] + (idx === 0 ? "" : " font-semibold")}>
             {onLabelClick && values[idx] > 0 ? (
               <button
                 onClick={() => onLabelClick(idx)}
                 className="hover:underline cursor-pointer text-left"
               >
-                {labels[idx]} ({formatNumber(values[idx])})
+                {label} ({formatNumber(values[idx])})
               </button>
             ) : (
-              <>{labels[idx]} ({formatNumber(values[idx])})</>
+              <>{label} ({formatNumber(values[idx])})</>
             )}
           </span>
         ))}
@@ -132,15 +132,42 @@ function KpiCard({
 // ─── Live Tracking SLA Component ──────────────────────────────────────
 function LiveTrackingSlaCard({ data = [] }: { data: GenericData[] }) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [debouncedSearchTerm] = useDebounce(searchTerm, 300);
+  const [debouncedSearchTerm] = useDebounce(searchTerm, 500); // 500ms debounce
+  const [serverData, setServerData] = useState<GenericData[] | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Use createClient directly here
+  const supabase = createClient();
 
-  const filteredData = data.filter((item) => {
+  useEffect(() => {
+    async function fetchSearch() {
+      if (!debouncedSearchTerm) {
+        setServerData(null);
+        return;
+      }
+      setIsLoading(true);
+      const q = `%${debouncedSearchTerm}%`;
+      const { data: searchResults } = await supabase
+        .from("shipments")
+        .select("no_stt, nama_customer_teks, status_pengiriman, status_detail_text, tgl_masuk")
+        .or(`no_stt.ilike.${q},nama_customer_teks.ilike.${q}`)
+        .order("tgl_masuk", { ascending: false })
+        .limit(100); // just limit to 100 results for the search specifically
+      
+      setServerData(searchResults || []);
+      setIsLoading(false);
+    }
+    fetchSearch();
+  }, [debouncedSearchTerm, supabase]);
+
+  // Fallback to local filter if serverData is null (e.g. search is empty)
+  const displayData = serverData !== null ? serverData : data.filter((item) => {
     if (!debouncedSearchTerm) return true;
     const q = debouncedSearchTerm.toLowerCase();
     return (
       String(item.no_stt || "").toLowerCase().includes(q) ||
       String(item.nama_customer_teks || "").toLowerCase().includes(q) ||
-      String(item.status_pengiriman || "").toLowerCase().includes(q)
+      String(item.status_detail_text || item.status_pengiriman || "").toLowerCase().includes(q)
     );
   });
 
@@ -166,16 +193,21 @@ function LiveTrackingSlaCard({ data = [] }: { data: GenericData[] }) {
         <input
           type="text"
           placeholder="Cari STT/Customer..."
-          className="w-full pl-9 pr-4 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:ring-1 focus:ring-orange-500 outline-none text-slate-700"
+          className="w-full pl-9 pr-9 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:ring-1 focus:ring-orange-500 outline-none text-slate-700"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
+        {isLoading && (
+          <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+            <RefreshCw size={14} className="text-orange-500 animate-spin" />
+          </div>
+        )}
       </div>
 
       {/* List Feed - Compact Two-Line Format */}
       <div className="max-h-[320px] overflow-y-auto space-y-2 pr-2 custom-scrollbar">
-        {filteredData.length > 0 ? (
-          filteredData.map((item, index) => (
+        {displayData.length > 0 ? (
+          displayData.map((item, index) => (
             <div key={index} className="flex gap-3 items-start p-2 rounded-lg hover:bg-slate-50 transition-colors">
               <div className="w-1.5 h-1.5 rounded-full bg-orange-500 mt-2 flex-shrink-0"></div>
               <div className="min-w-0 flex-1">
@@ -185,7 +217,7 @@ function LiveTrackingSlaCard({ data = [] }: { data: GenericData[] }) {
                   <span className="text-xs font-semibold text-slate-700 truncate">{item.nama_customer_teks || '-'}</span>
                 </div>
                 <div className="flex items-center gap-2 mt-0.5">
-                  <span className="text-[10px] px-1.5 py-0.5 bg-slate-100 text-slate-500 rounded font-medium">{item.status_pengiriman || '-'}</span>
+                  <span className="text-[10px] px-1.5 py-0.5 bg-slate-100 text-slate-500 rounded font-medium">{item.status_detail_text || item.status_pengiriman || '-'}</span>
                   <span className="text-[10px] text-slate-400">{item.tgl_masuk ? new Date(item.tgl_masuk).toLocaleDateString('id-ID') : ''}</span>
                 </div>
               </div>
@@ -328,9 +360,9 @@ function DashboardContent() {
     // Fetch Live Track SLA - fetch all STT without date filter for universal search
     let slaQuery = supabase
       .from("shipments")
-      .select("no_stt, nama_customer_teks, status_pengiriman, tgl_masuk")
+      .select("no_stt, nama_customer_teks, status_pengiriman, status_detail_text, tgl_masuk")
       .order("tgl_masuk", { ascending: false })
-      .limit(100);
+      .limit(200);
     
     if (activeService !== "all") {
       slaQuery = slaQuery.eq("jenis_layanan", activeService);
@@ -369,9 +401,9 @@ function DashboardContent() {
   const openKpiModal = async (type: string, statusIndex: number) => {
     let statusName = "";
     if (type === "SLA") statusName = statusIndex === 0 ? "Sesuai" : statusIndex === 1 ? "Konfirm" : "Gagal";
-    else if (type === "KUD") statusName = statusIndex === 0 ? "Tepat" : statusIndex === 1 ? "Lewat" : "Missing";
+    else if (type === "KUD") statusName = statusIndex === 0 ? "Tepat" : statusIndex === 1 ? "Lewat" : "Marketing";
     else if (type === "KOMPLAIN") statusName = statusIndex === 0 ? "Aman" : statusIndex === 1 ? "Teratasi" : "Berat";
-    else if (type === "DOC") statusName = statusIndex === 0 ? "Cepat" : statusIndex === 1 ? "Lambat" : "Gagal";
+    else if (type === "DOC") statusName = statusIndex === 0 ? "Cepat" : "Lambat";
 
     setKpiFocus(`${type} - ${statusName}`);
     setIsModalOpen(true);
@@ -413,7 +445,7 @@ function DashboardContent() {
         const val = (row.rate_kud || "").toLowerCase();
         if (statusIndex === 0) return /(tepat|sesuai|ok)/.test(val);
         if (statusIndex === 1) return /(lewat|lambat|belum)/.test(val);
-        if (statusIndex === 2) return !/(tepat|sesuai|ok)/.test(val) && !/(lewat|lambat|belum)/.test(val);
+        if (statusIndex === 2) return val.trim() !== "" && !/(tepat|sesuai|ok)/.test(val) && !/(lewat|lambat|belum)/.test(val);
         return false;
       });
     } else if (type === "KOMPLAIN") {
@@ -429,7 +461,6 @@ function DashboardContent() {
         const val = (row.kecepatan_doc || "").toLowerCase();
         if (statusIndex === 0) return val.includes("cepat");
         if (statusIndex === 1) return val.includes("lambat");
-        if (statusIndex === 2) return val.includes("gagal");
         return false;
       });
     }
@@ -756,7 +787,7 @@ function DashboardContent() {
                   <KpiCard
                     title="Performa SLA"
                     percent={slaPercent}
-                    labels={["Sesuai", "Konfirm", "Gagal"]}
+                    labels={["Sesuai", "Konfirm", "Lewat SLA"]}
                     values={[slaSesuai, slaKonfirm, slaGagal]}
                     colors={["text-slate-500", "text-orange-600", "text-red-500"]}
                     onLabelClick={(idx) => openKpiModal("SLA", idx)}
@@ -764,7 +795,7 @@ function DashboardContent() {
                   <KpiCard
                     title="Respons KUD"
                     percent={kudPercent}
-                    labels={["Tepat", "Lewat", "Missing"]}
+                    labels={["Tepat", "Lewat 5 Menit", "Marketing"]}
                     values={[kudTepat, kudLewat, kudMissing]}
                     colors={["text-slate-500", "text-orange-600", "text-red-500"]}
                     onLabelClick={(idx) => openKpiModal("KUD", idx)}
@@ -778,11 +809,11 @@ function DashboardContent() {
                     onLabelClick={(idx) => openKpiModal("KOMPLAIN", idx)}
                   />
                   <KpiCard
-                    title="Kecptn. Doc Kembali"
+                    title="Kecepatan Dokumen Kembali"
                     percent={docPercent}
-                    labels={["Cepat", "Lambat", "Gagal"]}
-                    values={[docCepat, docLambat, docGagal]}
-                    colors={["text-slate-500", "text-orange-600", "text-red-500"]}
+                    labels={["Cepat", "Lambat"]}
+                    values={[docCepat, docLambat]}
+                    colors={["text-slate-500", "text-orange-600"]}
                     onLabelClick={(idx) => openKpiModal("DOC", idx)}
                   />
                 </div>

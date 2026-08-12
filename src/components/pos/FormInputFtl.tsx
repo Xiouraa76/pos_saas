@@ -45,6 +45,7 @@ export function FormInputFtl() {
   const ITEMS_PER_PAGE = 20;
 
   // FTL Form State
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [nopol, setNopol] = useState("");
   const [driverName, setDriverName] = useState("");
   const [alamatMuat, setAlamatMuat] = useState("");
@@ -124,6 +125,43 @@ export function FormInputFtl() {
     fetchFtlShipments(debouncedSearchTerm, nextPage, true);
   };
 
+  const resetForm = () => {
+    setEditingId(null);
+    setNopol(""); setDriverName(""); setAlamatMuat(""); setAlamatTujuan("");
+    setSlaPerusahaan(""); setWaktuStartMuat(""); setWaktuSelesaiTf("");
+    setWaktuTibaSla(""); setWaktuTibaReal(""); setUraianPerjalanan(""); setPermintaanCustTiba("");
+  };
+
+  const handleEdit = (item: any) => {
+    setEditingId(item.id);
+    setNopol(item.master_vehicles?.nopol || "");
+    setDriverName(item.driver_name || "");
+    setAlamatMuat(item.alamat_muat || "");
+    setAlamatTujuan(item.alamat_tujuan || "");
+    setSlaPerusahaan(item.sla_perusahaan || "");
+    
+    const formatDateTimeLocal = (dateString: string | null) => {
+      if (!dateString) return "";
+      try {
+        const d = new Date(dateString);
+        if (isNaN(d.getTime())) return dateString.slice(0, 16);
+        const pad = (n: number) => n.toString().padStart(2, '0');
+        return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+      } catch (e) {
+        return "";
+      }
+    };
+
+    setWaktuStartMuat(formatDateTimeLocal(item.waktu_start_muat));
+    setWaktuSelesaiTf(formatDateTimeLocal(item.waktu_selesai_tf));
+    setWaktuTibaSla(formatDateTimeLocal(item.waktu_tiba_sla));
+    setWaktuTibaReal(formatDateTimeLocal(item.waktu_tiba_real));
+    setUraianPerjalanan(item.uraian_perjalanan || "");
+    setPermintaanCustTiba(item.keterangan_custom || "");
+    
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -166,15 +204,17 @@ export function FormInputFtl() {
         keterangan_custom: sanitizeOrNull(permintaanCustTiba, MAX_LEN.long)
       };
 
-      const { error } = await supabase.from("shipments").insert(payload);
-      if (error) throw error;
+      if (editingId) {
+        const { error } = await supabase.from("shipments").update(payload).eq("id", editingId);
+        if (error) throw error;
+        alert("Data FTL Berhasil Diperbarui!");
+      } else {
+        const { error } = await supabase.from("shipments").insert(payload);
+        if (error) throw error;
+        alert("Data FTL Berhasil Disimpan!");
+      }
       
-      alert("Data FTL Berhasil Disimpan!");
-      
-      // Reset Form
-      setNopol(""); setDriverName(""); setAlamatMuat(""); setAlamatTujuan("");
-      setSlaPerusahaan(""); setWaktuStartMuat(""); setWaktuSelesaiTf("");
-      setWaktuTibaSla(""); setWaktuTibaReal(""); setUraianPerjalanan(""); setPermintaanCustTiba("");
+      resetForm();
       
       setPage(0);
       await fetchFtlShipments(debouncedSearchTerm, 0, false);
@@ -190,7 +230,9 @@ export function FormInputFtl() {
     <div className="space-y-6">
       <Card className="border-orange-100 shadow-sm bg-white">
         <CardHeader className="pb-4">
-          <CardTitle className="font-sans text-lg text-slate-800">Form Input Data Perjalanan FTL</CardTitle>
+          <CardTitle className="font-sans text-lg text-slate-800">
+            {editingId ? "Edit Data Perjalanan FTL" : "Form Input Data Perjalanan FTL"}
+          </CardTitle>
           <CardDescription>Catat detail armada, driver, SLA rute, dan waktu perjalanan riil.</CardDescription>
         </CardHeader>
         <CardContent>
@@ -269,9 +311,14 @@ export function FormInputFtl() {
               <Input value={permintaanCustTiba} onChange={e => setPermintaanCustTiba(e.target.value)} placeholder="Keterangan tambahan..." disabled={isLoading} />
             </div>
 
-            <div className="flex justify-end pt-4">
+            <div className="flex justify-end pt-4 gap-2">
+              {editingId && (
+                <Button type="button" variant="outline" onClick={resetForm} disabled={isLoading}>
+                  Batal Edit
+                </Button>
+              )}
               <Button type="submit" disabled={isLoading} className="bg-orange-600 hover:bg-orange-700 text-white w-full md:w-auto px-8">
-                {isLoading ? 'Menyimpan...' : 'Simpan Log FTL'}
+                {isLoading ? 'Menyimpan...' : (editingId ? 'Update Log FTL' : 'Simpan Log FTL')}
               </Button>
             </div>
           </form>
@@ -301,6 +348,7 @@ export function FormInputFtl() {
                 <TableHead>Rute SLA</TableHead>
                 <TableHead>Tiba Real</TableHead>
                 <TableHead>Jurnal Perjalanan</TableHead>
+                <TableHead className="text-right">Aksi</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -312,11 +360,16 @@ export function FormInputFtl() {
                   <TableCell>{item.sla_perusahaan || '-'}</TableCell>
                   <TableCell>{item.waktu_tiba_real ? new Date(item.waktu_tiba_real).toLocaleString('id-ID') : 'Belum Tiba'}</TableCell>
                   <TableCell className="max-w-xs truncate text-xs" title={item.uraian_perjalanan}>{item.uraian_perjalanan || '-'}</TableCell>
+                  <TableCell className="text-right">
+                    <Button variant="ghost" size="sm" onClick={() => handleEdit(item)} className="text-blue-600 hover:text-blue-800 hover:bg-blue-50">
+                      Edit
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))}
               {data.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-6 text-slate-500">Data FTL tidak ditemukan.</TableCell>
+                  <TableCell colSpan={7} className="text-center py-6 text-slate-500">Data FTL tidak ditemukan.</TableCell>
                 </TableRow>
               )}
             </TableBody>
