@@ -39,3 +39,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# backup & recovery files
+*.bak
+*.recovered*
+
+# one-off scripts (may contain hardcoded credentials)
+*.py
+
+# data files
+*.xlsx
