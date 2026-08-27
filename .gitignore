@@ -49,3 +49,12 @@ next-env.d.ts
 
 # data files
 *.xlsx
+
+# sensitive test scripts
+tests/qa_rbac_audit.mjs
+tests/rbac.test.js
+
+# log and patch files
+*.log
+*.txt
+*.patch

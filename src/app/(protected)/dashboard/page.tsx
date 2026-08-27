@@ -149,7 +149,7 @@ function LiveTrackingSlaCard({ data = [] }: { data: GenericData[] }) {
       const q = `%${debouncedSearchTerm}%`;
       const { data: searchResults } = await supabase
         .from("shipments")
-        .select("no_stt, nama_customer_teks, status_pengiriman, status_detail_text, tgl_masuk")
+        .select("no_stt, nama_customer_teks, status_pengiriman, status_detail_text, tgl_masuk, jenis_layanan")
         .or(`no_stt.ilike.${q},nama_customer_teks.ilike.${q}`)
         .order("tgl_masuk", { ascending: false })
         .limit(100); // just limit to 100 results for the search specifically
@@ -207,14 +207,36 @@ function LiveTrackingSlaCard({ data = [] }: { data: GenericData[] }) {
       {/* List Feed - Compact Two-Line Format */}
       <div className="max-h-[320px] overflow-y-auto space-y-2 pr-2 custom-scrollbar">
         {displayData.length > 0 ? (
-          displayData.map((item, index) => (
+          displayData.map((item, index) => {
+            // Color-coded status dot
+            const statusDotColor: Record<string, string> = {
+              "Bermasalah": "bg-red-500",
+              "Selesai Bongkar": "bg-emerald-500",
+              "Dokumen Kembali": "bg-emerald-500",
+              "Di Perjalanan": "bg-orange-500",
+              "Bongkar": "bg-amber-500",
+              "Di Lokasi Muat": "bg-blue-500",
+              "Selesai Muat": "bg-blue-400",
+            };
+            const dotColor = statusDotColor[item.status_pengiriman] || "bg-slate-300";
+
+            // Service badge color
+            const serviceBadge: Record<string, string> = {
+              "FTL": "bg-orange-100 text-orange-700",
+              "LTL": "bg-indigo-100 text-indigo-700",
+              "LCL": "bg-teal-100 text-teal-700",
+            };
+            const badgeClass = serviceBadge[item.jenis_layanan] || "bg-slate-100 text-slate-500";
+
+            return (
             <div key={index} className="flex gap-3 items-start p-2 rounded-lg hover:bg-slate-50 transition-colors">
-              <div className="w-1.5 h-1.5 rounded-full bg-orange-500 mt-2 flex-shrink-0"></div>
+              <div className={`w-2 h-2 rounded-full ${dotColor} mt-1.5 flex-shrink-0 ${item.status_pengiriman === 'Bermasalah' ? 'animate-pulse' : ''}`}></div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-bold font-mono text-orange-700 truncate">{item.no_stt || '-'}</span>
-                  <span className="text-[10px] text-slate-400">·</span>
-                  <span className="text-xs font-semibold text-slate-700 truncate">{item.nama_customer_teks || '-'}</span>
+                  {item.jenis_layanan && (
+                    <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold ${badgeClass}`}>{item.jenis_layanan}</span>
+                  )}
                 </div>
                 <div className="flex items-center gap-2 mt-0.5">
                   <span className="text-[10px] px-1.5 py-0.5 bg-slate-100 text-slate-500 rounded font-medium">{item.status_detail_text || item.status_pengiriman || '-'}</span>
@@ -222,7 +244,8 @@ function LiveTrackingSlaCard({ data = [] }: { data: GenericData[] }) {
                 </div>
               </div>
             </div>
-          ))
+            );
+          })
         ) : (
           <div className="text-center text-xs text-slate-400 py-4">Data tidak ditemukan</div>
         )}
@@ -360,7 +383,7 @@ function DashboardContent() {
     // Fetch Live Track SLA - fetch all STT without date filter for universal search
     let slaQuery = supabase
       .from("shipments")
-      .select("no_stt, nama_customer_teks, status_pengiriman, status_detail_text, tgl_masuk")
+      .select("no_stt, nama_customer_teks, status_pengiriman, status_detail_text, tgl_masuk, jenis_layanan")
       .order("tgl_masuk", { ascending: false })
       .limit(200);
     

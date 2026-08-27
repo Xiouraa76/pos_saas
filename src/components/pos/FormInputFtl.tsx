@@ -7,8 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { createClient } from "@/utils/supabase/client";
+import { AlertTriangle } from "lucide-react";
 
 interface GenericData {
   id?: string;
@@ -38,6 +40,7 @@ export function FormInputFtl() {
   const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
   const [isLoading, setIsLoading] = useState(false);
   const [slaOptions, setSlaOptions] = useState<GenericData[]>([]);
+  const [statusFilter, setStatusFilter] = useState("all");
 
   // Pagination State
   const [page, setPage] = useState(0);
@@ -58,7 +61,27 @@ export function FormInputFtl() {
   const [waktuTibaReal, setWaktuTibaReal] = useState("");
   
   const [uraianPerjalanan, setUraianPerjalanan] = useState("");
-  const [permintaanCustTiba, setPermintaanCustTiba] = useState("");const fetchSlaOptions = async () => {
+  const [permintaanCustTiba, setPermintaanCustTiba] = useState("");
+  const [isBermasalah, setIsBermasalah] = useState(false);
+
+  // ─── Auto-compute status from time fields ────────────────────────
+  function computeFtlStatus(fields: { waktuTibaReal: string; waktuTibaSla: string; waktuSelesaiTf: string; waktuStartMuat: string; isBermasalah: boolean; slaPerusahaan: string; }) {
+    if (fields.isBermasalah) {
+      return { status: "Bermasalah" as const, detail: "Bermasalah - Ditandai manual oleh admin" };
+    }
+    if (fields.waktuTibaReal) {
+      return { status: "Selesai Bongkar" as const, detail: `Selesai Bongkar - ${fields.slaPerusahaan || 'Tiba di tujuan'}` };
+    }
+    if (fields.waktuSelesaiTf || fields.waktuTibaSla) {
+      return { status: "Di Perjalanan" as const, detail: `Di Perjalanan - ${fields.slaPerusahaan || 'Menuju tujuan'}` };
+    }
+    if (fields.waktuStartMuat) {
+      return { status: "Di Lokasi Muat" as const, detail: `Di Lokasi Muat - ${fields.slaPerusahaan || 'Proses muat'}` };
+    }
+    return { status: "Custom" as const, detail: "Baru dibuat - Belum ada update waktu" };
+  }
+
+  const fetchSlaOptions = async () => {
     try {
       const { data: slas } = await supabase.from('master_sla_perusahaan').select('*');
       setSlaOptions(slas || []);
@@ -73,6 +96,8 @@ export function FormInputFtl() {
         .select(`*, master_vehicles(nopol)`)
         .eq('jenis_layanan', 'FTL')
         .order('created_at', { ascending: false });
+
+      // Note: statusFilter is applied client-side after fetch for simplicity
 
       if (term && term.trim() !== "") {
         const { data: vData } = await supabase.from('master_vehicles').select('id').ilike('nopol', `%${term}%`);
@@ -130,6 +155,7 @@ export function FormInputFtl() {
     setNopol(""); setDriverName(""); setAlamatMuat(""); setAlamatTujuan("");
     setSlaPerusahaan(""); setWaktuStartMuat(""); setWaktuSelesaiTf("");
     setWaktuTibaSla(""); setWaktuTibaReal(""); setUraianPerjalanan(""); setPermintaanCustTiba("");
+    setIsBermasalah(false);
   };
 
   const handleEdit = (item: any) => {
@@ -158,6 +184,7 @@ export function FormInputFtl() {
     setWaktuTibaReal(formatDateTimeLocal(item.waktu_tiba_real));
     setUraianPerjalanan(item.uraian_perjalanan || "");
     setPermintaanCustTiba(item.keterangan_custom || "");
+    setIsBermasalah(item.status_pengiriman === "Bermasalah");
     
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -188,7 +215,13 @@ export function FormInputFtl() {
         return;
       }
 
-      // 3. Insert FTL Shipment (semua field di-sanitize, CELAH-05 fix)
+      // 3. Auto-compute status from time fields
+      const computed = computeFtlStatus({
+        waktuTibaReal, waktuTibaSla, waktuSelesaiTf, waktuStartMuat,
+        isBermasalah, slaPerusahaan
+      });
+
+      // 4. Insert FTL Shipment (semua field di-sanitize, CELAH-05 fix)
       const payload: Record<string, any> = {
         jenis_layanan: 'FTL',
         vehicle_id: vehicleId,
@@ -201,7 +234,9 @@ export function FormInputFtl() {
         waktu_tiba_sla: waktuTibaSla || null,
         waktu_tiba_real: waktuTibaReal || null,
         uraian_perjalanan: sanitizeOrNull(uraianPerjalanan, MAX_LEN.long),
-        keterangan_custom: sanitizeOrNull(permintaanCustTiba, MAX_LEN.long)
+        keterangan_custom: sanitizeOrNull(permintaanCustTiba, MAX_LEN.long),
+        status_pengiriman: computed.status,
+        status_detail_text: computed.detail,
       };
 
       if (editingId) {
@@ -306,12 +341,49 @@ export function FormInputFtl() {
               />
             </div>
             
-            <div className="space-y-2">
-              <Label>Permintaan Cust Tiba & Keterangan</Label>
-              <Input value={permintaanCustTiba} onChange={e => setPermintaanCustTiba(e.target.value)} placeholder="Keterangan tambahan..." disabled={isLoading} />
-            </div>
+             <div className="space-y-2">
+               <Label>Permintaan Cust Tiba & Keterangan</Label>
+               <Input value={permintaanCustTiba} onChange={e => setPermintaanCustTiba(e.target.value)} placeholder="Keterangan tambahan..." disabled={isLoading} />
+             </div>
 
-            <div className="flex justify-end pt-4 gap-2">
+             {/* ─── Bermasalah Override ─── */}
+             <div className="flex items-center gap-3 p-3 rounded-lg border border-red-200 bg-red-50/50">
+               <input
+                 type="checkbox"
+                 id="bermasalah_ftl"
+                 checked={isBermasalah}
+                 onChange={e => setIsBermasalah(e.target.checked)}
+                 className="rounded border-red-300 text-red-600 focus:ring-red-500 h-4 w-4"
+                 disabled={isLoading}
+               />
+               <label htmlFor="bermasalah_ftl" className="flex items-center gap-2 text-sm font-medium text-red-700 cursor-pointer">
+                 <AlertTriangle className="w-4 h-4" />
+                 Tandai Bermasalah (Truk mogok, kecelakaan, kendala berat)
+               </label>
+             </div>
+
+             {/* ─── Auto Status Preview ─── */}
+             {(() => {
+               const preview = computeFtlStatus({ waktuTibaReal, waktuTibaSla, waktuSelesaiTf, waktuStartMuat, isBermasalah, slaPerusahaan });
+               const colorMap: Record<string, string> = {
+                 "Bermasalah": "bg-red-100 text-red-700 border-red-200",
+                 "Selesai Bongkar": "bg-emerald-100 text-emerald-700 border-emerald-200",
+                 "Di Perjalanan": "bg-orange-100 text-orange-700 border-orange-200",
+                 "Di Lokasi Muat": "bg-blue-100 text-blue-700 border-blue-200",
+                 "Custom": "bg-slate-100 text-slate-600 border-slate-200",
+               };
+               return (
+                 <div className="flex items-center gap-2 text-xs">
+                   <span className="text-slate-500 font-medium">Status otomatis:</span>
+                   <span className={`px-2.5 py-1 rounded-full border font-semibold ${colorMap[preview.status] || colorMap.Custom}`}>
+                     {preview.status}
+                   </span>
+                   <span className="text-slate-400 truncate">{preview.detail}</span>
+                 </div>
+               );
+             })()}
+
+             <div className="flex justify-end pt-4 gap-2">
               {editingId && (
                 <Button type="button" variant="outline" onClick={resetForm} disabled={isLoading}>
                   Batal Edit
@@ -330,12 +402,26 @@ export function FormInputFtl() {
         <CardHeader className="pb-4 border-b bg-slate-50">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <CardTitle className="font-sans text-lg">Log Eksekusi Terakhir (FTL)</CardTitle>
-            <Input 
-              placeholder="Cari Driver atau Nopol..." 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="max-w-xs bg-white"
-            />
+            <div className="flex gap-2 items-center">
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="h-9 rounded-md border border-input bg-background px-3 text-sm font-sans focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <option value="all">Semua Status</option>
+                <option value="Di Lokasi Muat">Di Lokasi Muat</option>
+                <option value="Di Perjalanan">Di Perjalanan</option>
+                <option value="Selesai Bongkar">Selesai Bongkar</option>
+                <option value="Bermasalah">Bermasalah</option>
+                <option value="belum">Belum Ada Status</option>
+              </select>
+              <Input 
+                placeholder="Cari Driver atau Nopol..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="max-w-xs bg-white"
+              />
+            </div>
           </div>
         </CardHeader>
         <CardContent className="p-0 overflow-x-auto">
@@ -346,30 +432,63 @@ export function FormInputFtl() {
                 <TableHead>Nopol</TableHead>
                 <TableHead>Driver</TableHead>
                 <TableHead>Rute SLA</TableHead>
+                <TableHead>Status Terakhir</TableHead>
                 <TableHead>Tiba Real</TableHead>
                 <TableHead>Jurnal Perjalanan</TableHead>
                 <TableHead className="text-right">Aksi</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data.map(item => (
-                <TableRow key={item.id}>
-                  <TableCell>{item.created_at ? new Date(item.created_at).toLocaleDateString('id-ID') : '-'}</TableCell>
-                  <TableCell className="font-mono font-medium">{item.master_vehicles?.nopol || '-'}</TableCell>
-                  <TableCell>{item.driver_name || '-'}</TableCell>
-                  <TableCell>{item.sla_perusahaan || '-'}</TableCell>
-                  <TableCell>{item.waktu_tiba_real ? new Date(item.waktu_tiba_real).toLocaleString('id-ID') : 'Belum Tiba'}</TableCell>
-                  <TableCell className="max-w-xs truncate text-xs" title={item.uraian_perjalanan}>{item.uraian_perjalanan || '-'}</TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="ghost" size="sm" onClick={() => handleEdit(item)} className="text-blue-600 hover:text-blue-800 hover:bg-blue-50">
-                      Edit
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-              {data.length === 0 && (
+              {data
+                .filter(item => {
+                  if (statusFilter === "all") return true;
+                  if (statusFilter === "belum") return !item.status_pengiriman || item.status_pengiriman === "Custom";
+                  return item.status_pengiriman === statusFilter;
+                })
+                .map(item => {
+                  const statusColor: Record<string, string> = {
+                    "Bermasalah": "bg-red-100 text-red-700",
+                    "Selesai Bongkar": "bg-emerald-100 text-emerald-700",
+                    "Dokumen Kembali": "bg-emerald-100 text-emerald-700",
+                    "Di Perjalanan": "bg-orange-100 text-orange-700",
+                    "Bongkar": "bg-amber-100 text-amber-700",
+                    "Di Lokasi Muat": "bg-blue-100 text-blue-700",
+                    "Selesai Muat": "bg-blue-100 text-blue-700",
+                    "Custom": "bg-slate-100 text-slate-600",
+                  };
+                  const statusBadgeClass = statusColor[item.status_pengiriman] || "bg-slate-100 text-slate-500";
+                  return (
+                    <TableRow key={item.id}>
+                      <TableCell>{item.created_at ? new Date(item.created_at).toLocaleDateString('id-ID') : '-'}</TableCell>
+                      <TableCell className="font-mono font-medium">{item.master_vehicles?.nopol || '-'}</TableCell>
+                      <TableCell>{item.driver_name || '-'}</TableCell>
+                      <TableCell>{item.sla_perusahaan || '-'}</TableCell>
+                      <TableCell>
+                        {item.status_pengiriman ? (
+                          <Badge className={`${statusBadgeClass} border-none text-xs font-semibold`}>
+                            {item.status_pengiriman}
+                          </Badge>
+                        ) : (
+                          <span className="text-slate-400 text-xs italic">Belum ada status</span>
+                        )}
+                      </TableCell>
+                      <TableCell>{item.waktu_tiba_real ? new Date(item.waktu_tiba_real).toLocaleString('id-ID') : 'Belum Tiba'}</TableCell>
+                      <TableCell className="max-w-xs truncate text-xs" title={item.uraian_perjalanan}>{item.uraian_perjalanan || '-'}</TableCell>
+                      <TableCell className="text-right">
+                        <Button variant="ghost" size="sm" onClick={() => handleEdit(item)} className="text-blue-600 hover:text-blue-800 hover:bg-blue-50">
+                          Edit
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              {data.filter(item => {
+                if (statusFilter === "all") return true;
+                if (statusFilter === "belum") return !item.status_pengiriman || item.status_pengiriman === "Custom";
+                return item.status_pengiriman === statusFilter;
+              }).length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-6 text-slate-500">Data FTL tidak ditemukan.</TableCell>
+                  <TableCell colSpan={8} className="text-center py-6 text-slate-500">Data FTL tidak ditemukan.</TableCell>
                 </TableRow>
               )}
             </TableBody>
