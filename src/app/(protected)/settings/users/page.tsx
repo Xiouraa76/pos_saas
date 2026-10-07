@@ -9,16 +9,30 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, Settings2, Trash2 } from "lucide-react";
 
-interface GenericData {
-  id?: string;
-  [key: string]: any;
+interface UserPermissions {
+  display_name: string;
+  role: string;
+  can_access_dashboard: boolean;
+  can_access_pos: boolean;
+  can_access_settings: boolean;
+  can_access_ftl: boolean;
+  can_access_ltl: boolean;
+  can_access_lcl: boolean;
+}
+
+interface UserData {
+  id: string;
+  email: string;
+  created_at: string;
+  permissions: UserPermissions | null;
 }
 
 
 export default function UsersSettingsPage() {
-  const [users, setUsers] = useState<GenericData[]>([]);
+  const [users, setUsers] = useState<UserData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeletingId, setIsDeletingId] = useState<string | null>(null); // BUG-1: track which row is being deleted
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   
@@ -44,9 +58,13 @@ export default function UsersSettingsPage() {
       const data = await res.json();
       if (data.users) {
         setUsers(data.users);
+      } else if (data.error) {
+        // BUG-2 fix: tampilkan error ke user, bukan hanya console
+        alert(`Gagal memuat data pengguna: ${data.error}`);
       }
     } catch (error) {
       console.error("Failed to fetch users", error);
+      alert("Gagal memuat data pengguna. Periksa koneksi Anda.");
     } finally {
       setIsLoading(false);
     }
@@ -73,7 +91,7 @@ export default function UsersSettingsPage() {
     setIsModalOpen(true);
   };
 
-  const openEditModal = (user: Record<string, any>) => {
+  const openEditModal = (user: UserData) => {
     setIsEditing(true);
     setEditingId(user.id);
     setEmail(user.email);
@@ -90,22 +108,27 @@ export default function UsersSettingsPage() {
   };
 
   const handleDelete = async (id: string, email: string) => {
+    // BUG-1 fix: cegah eksekusi ganda jika sudah ada request yang berjalan
+    if (isDeletingId) return;
+
     if (confirm(`Apakah Anda yakin ingin menghapus pengguna ${email}?`)) {
+      setIsDeletingId(id);
       try {
-        const res = await fetch(`/api/admin/users?id=${id}&email=${email}`, {
+        const res = await fetch(`/api/admin/users?id=${id}`, {
           method: 'DELETE',
         });
         const data = await res.json();
-        
+
         if (data.error) {
           alert(data.error);
         } else {
-           
           fetchUsers();
         }
       } catch (err) {
         console.error(err);
         alert("Gagal menghapus pengguna.");
+      } finally {
+        setIsDeletingId(null);
       }
     }
   };
@@ -230,8 +253,17 @@ export default function UsersSettingsPage() {
                         <Button variant="ghost" size="sm" onClick={() => openEditModal(user)} className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50">
                           <Settings2 className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="sm" onClick={() => handleDelete(user.id || '', user.email || '')} className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50">
-                          <Trash2 className="h-4 w-4" />
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDelete(user.id || '', user.email || '')}
+                          disabled={isDeletingId === user.id}
+                          className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                          title="Hapus pengguna"
+                        >
+                          {isDeletingId === user.id
+                            ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-red-400 border-t-transparent" />
+                            : <Trash2 className="h-4 w-4" />}
                         </Button>
                       </div>
                     </TableCell>
