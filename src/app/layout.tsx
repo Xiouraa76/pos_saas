@@ -17,7 +17,11 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = <meta name="probely-verification" content="d695cf9a-6fd9-4aaf-a676-dddc216dd415" />
+export const metadata: Metadata = {
+  other: {
+    "probely-verification": "d695cf9a-6fd9-4aaf-a676-dddc216dd415",
+  },
+};
 
 export default function RootLayout({
   children,
