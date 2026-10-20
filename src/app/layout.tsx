@@ -20,6 +20,11 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "cAm LOGISTICS Command Center",
   description: "Delivery Management POS and Analytics Dashboard",
+  verification: {
+    other: {
+      "probely-verification": "d695cf9a-6fd9-4aaf-a676-dddc216dd415",
+    },
+  },
 };
 
 export default function RootLayout({
